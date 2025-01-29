@@ -107,7 +107,7 @@ This makes it an invaluable tool for troubleshooting complex issues that span mu
 
 ## User Guide
 
-Please check our [user guide](./docs/user-guide.md).
+Please check our [user guide](./docs/en/user-guide.md).
 
 ## Contribute
 
