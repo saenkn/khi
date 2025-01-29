@@ -79,6 +79,7 @@ This makes it an invaluable tool for troubleshooting complex issues that span mu
 > [!NOTE]
 > The container image source may change in the soon future. #21
 
+For more details, please try [Getting started](./docs/en/getting-started.md).
 
 ### Run from source code
 

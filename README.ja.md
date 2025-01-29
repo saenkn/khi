@@ -74,6 +74,8 @@ Kubernetes History Inspector (KHI) は、Kubernetesクラスタのログ可視�
 > [!NOTE]
 > コンテナイメージの配信元は近いうちに変更される可能性があります。 #21
 
+詳細は [Getting Started](./docs/en/getting-started.md) を参照してください。
+
 ### ソースから実行
 
 <details>
