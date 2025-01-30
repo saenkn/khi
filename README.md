@@ -106,6 +106,24 @@ For more details, please try [Getting started](./docs/en/getting-started.md).
 
 </details>
 
+### Authentication settings
+
+#### Google Cloud
+
+Your account must have the following permissions granted:
+
+**Required**
+
+* `logging.logEntries.list`
+
+**Optional**
+
+This permission is used to show a suggestion popup to fill the forms of log filter.
+It works without the permission, but the suggestive autocomplete won't appear. 
+
+* Cluster list permission for the cluster type (e.g `container.clusters.list` for GKE)
+
+
 ## User Guide
 
 Please check our [user guide](./docs/en/user-guide.md).
