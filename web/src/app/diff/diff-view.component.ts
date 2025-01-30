@@ -48,6 +48,11 @@ import {
   TimelineLayer,
 } from '../store/timeline';
 import { ResourceRevision } from '../store/revision';
+import { CommonModule } from '@angular/common';
+import { ParsePrincipalPipe } from './diff-view-pipes';
+import { TimestampFormatPipe } from '../common/timestamp-format.pipe';
+import { UnifiedDiffComponent } from 'ngx-diff';
+import { HighlightModule } from 'ngx-highlightjs';
 
 class DiffViewScrollStrategy extends FixedSizeVirtualScrollStrategy {
   constructor() {
@@ -71,6 +76,14 @@ type DiffViewViewModel = {
   selector: 'khi-diff-view',
   templateUrl: './diff-view.component.html',
   styleUrls: ['./diff-view.component.sass'],
+  imports:[
+    CommonModule,
+    CdkVirtualScrollViewport,
+    ParsePrincipalPipe,
+    TimestampFormatPipe,
+    UnifiedDiffComponent,
+    HighlightModule
+  ],
   providers: [
     { provide: VIRTUAL_SCROLL_STRATEGY, useClass: DiffViewScrollStrategy },
   ],

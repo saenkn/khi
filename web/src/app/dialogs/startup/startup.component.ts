@@ -33,7 +33,6 @@ import { BackendAPIUtil } from 'src/app/services/api/backend-api.service';
 import { InspectionDataLoaderService } from 'src/app/services/data-loader.service';
 import { InspectionMetadataDialogComponent } from '../inspection-metadata/inspection-metadata.component';
 import { openNewInspectionDialog } from '../new-inspection/new-inspection.component';
-import { NgxEnvModule } from '@ngx-env/core';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -85,7 +84,6 @@ export type TaskListViewModel = {
   standalone: true,
   imports: [
     CommonModule,
-    NgxEnvModule,
     MatIconModule,
     MatTooltipModule,
     MatButtonModule,

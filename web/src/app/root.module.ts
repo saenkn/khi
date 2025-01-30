@@ -85,7 +85,9 @@ import {
 } from '@angular/material/tooltip';
 import { ViewStateService } from './services/view-state.service';
 @NgModule({
-  declarations: [AppComponent, RootComponent],
+  declarations: [
+    RootComponent,
+  ],
   imports: [
     CommonModule,
     KHICommonModule,
@@ -97,6 +99,7 @@ import { ViewStateService } from './services/view-state.service';
     DiffModule,
     GraphPageModule,
     TimelineModule,
+    AppComponent, 
     MatSnackBarModule,
     RouterModule.forRoot(KHIRoutes),
     MatIconModule,

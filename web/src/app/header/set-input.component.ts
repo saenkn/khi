@@ -23,20 +23,33 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, Observable } from 'rxjs';
 import {
   filteElementsByIncludedSubstring,
   iterToArr,
   subtractSet,
 } from '../utils/collection-util';
+import { CommonModule } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'khi-header-set-input',
   templateUrl: './set-input.component.html',
   styleUrls: ['./set-input.component.sass'],
+  imports:[
+    CommonModule,
+    MatFormFieldModule,
+    MatChipsModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    MatTooltipModule
+  ]
 })
 export class SetInputComponent implements OnInit {
   @Input()

@@ -43,7 +43,6 @@ import { CHANGE_PAIR_ANNOTATOR_RESOLVER } from '../annotator/change-pair/resolve
 import { getDefaultChangePairAnnotatorResolver } from '../annotator/change-pair/default';
 
 @NgModule({
-  declarations: [DiffViewComponent, ParsePrincipalPipe, DiffComponent],
   imports: [
     UnifiedDiffComponent,
     SideBySideDiffComponent,
@@ -57,6 +56,9 @@ import { getDefaultChangePairAnnotatorResolver } from '../annotator/change-pair/
     HeaderModule,
     HighlightModule,
     ScrollingModule,
+    DiffViewComponent,
+    ParsePrincipalPipe,
+    DiffComponent
   ],
   providers: [
     provideHighlightOptions({
@@ -85,4 +87,4 @@ import { getDefaultChangePairAnnotatorResolver } from '../annotator/change-pair/
   ],
   exports: [DiffViewComponent],
 })
-export class DiffModule {}
+export class DiffModule { }

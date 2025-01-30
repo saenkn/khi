@@ -23,11 +23,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { KHICommonModule } from '../common/common.module';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgxEnvModule } from '@ngx-env/core';
 import { NavigatorComponent } from './navigator/navigator.component';
 
 @NgModule({
-  declarations: [TimelineComponent, NavigatorComponent],
+  declarations: [],
   imports: [
     CommonModule,
     KHICommonModule,
@@ -36,7 +35,8 @@ import { NavigatorComponent } from './navigator/navigator.component';
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    NgxEnvModule,
+    TimelineComponent, 
+    NavigatorComponent
   ],
   exports: [TimelineComponent],
 })

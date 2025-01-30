@@ -35,15 +35,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
 import { KHICommonModule } from '../common/common.module';
 import { StartupDialogComponent } from './startup/startup.component';
-import { NgxEnvModule } from '@ngx-env/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
-  declarations: [
-    ProgressDialogComponent,
-    NewInspectionDialogComponent,
-    InspectionMetadataDialogComponent,
-  ],
   imports: [
     CommonModule,
     KHICommonModule,
@@ -61,9 +55,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    NgxEnvModule,
     MatTooltipModule,
     StartupDialogComponent,
+    ProgressDialogComponent,
+    NewInspectionDialogComponent,
+    InspectionMetadataDialogComponent,
   ],
   exports: [
     ProgressDialogComponent,

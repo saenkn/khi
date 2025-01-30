@@ -22,7 +22,6 @@ import {
   WindowConnectorService,
 } from '../services/frame-connection/window-connector.service';
 import { InMemoryWindowConnectionProvider } from '../services/frame-connection/window-connection-provider.service';
-import { NgxEnvModule } from '@ngx-env/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { KHICommonModule } from '../common/common.module';
@@ -36,7 +35,6 @@ describe('TitlebarComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [TitleBarComponent],
       imports: [
-        NgxEnvModule,
         MatIconModule,
         MatButtonModule,
         KHICommonModule,

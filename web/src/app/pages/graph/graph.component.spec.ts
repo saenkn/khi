@@ -17,7 +17,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { NgxEnvModule } from '@ngx-env/core';
 import { GraphComponent } from './graph.component';
 import { ArchitectureGraphComponent } from './architecture-graph/architecture-graph.component';
 import {
@@ -32,7 +31,7 @@ describe('GraphComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [GraphComponent, ArchitectureGraphComponent],
-      imports: [NgxEnvModule, MatToolbarModule, MatIconModule, HeaderModule],
+      imports: [MatToolbarModule, MatIconModule, HeaderModule],
       providers: [
         WindowConnectorService,
         {

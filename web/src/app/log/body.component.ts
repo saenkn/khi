@@ -18,11 +18,21 @@ import { Component, EnvironmentInjector, Input, inject } from '@angular/core';
 import { LOG_TOOL_ANNOTATOR_RESOLVER } from '../annotator/log-tool/resolver';
 import { Subject, map, shareReplay, startWith, withLatestFrom } from 'rxjs';
 import { InspectionDataStoreService } from '../services/inspection-data-store.service';
+import { CommonModule } from '@angular/common';
+import { LogHeaderComponent } from './header.component';
+import { HighlightModule } from 'ngx-highlightjs';
+import { ResolveTextPipe } from '../common/resolve-text.pipe';
 
 @Component({
   selector: 'khi-log-body',
   templateUrl: './body.component.html',
   styleUrls: ['./body.component.sass'],
+  imports:[
+    CommonModule,
+    LogHeaderComponent,
+    HighlightModule,
+    ResolveTextPipe
+  ]
 })
 export class LogBodyComponent {
   private readonly dataStore = inject(InspectionDataStoreService);

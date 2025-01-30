@@ -41,10 +41,26 @@ import {
   EXTENSION_STORE,
   ExtensionStore,
 } from 'src/app/extensions/extension-common/extension-store';
+import { CommonModule } from '@angular/common';
+import { HeaderModule } from 'src/app/header/header.module';
+import { TimelineComponent } from 'src/app/timeline/timeline.component';
+import { SidePaneComponent } from 'src/app/common/components/side-pane.component';
+import { LogViewComponent } from 'src/app/log/log-view.component';
+import { DiffViewComponent } from 'src/app/diff/diff-view.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.sass'],
+  imports:[
+    CommonModule,
+    HeaderModule,
+    TimelineComponent,
+    SidePaneComponent,
+    LogViewComponent,
+    DiffViewComponent,
+    MatIconModule, 
+  ]
 })
 export class AppComponent implements OnInit, OnDestroy {
   readonly destroyed = new Subject<void>();

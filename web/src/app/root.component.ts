@@ -20,5 +20,6 @@ import { Component } from '@angular/core';
   selector: 'khi-root',
   templateUrl: './root.component.html',
   styleUrls: ['./root.component.sass'],
+  standalone:false
 })
 export class RootComponent {}

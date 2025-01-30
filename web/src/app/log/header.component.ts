@@ -27,11 +27,15 @@ import {
   LOG_ANNOTATOR_RESOLVER,
   LogAnnotatorResolver,
 } from '../annotator/log/resolver';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'khi-log-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.sass'],
+  imports:[
+    CommonModule,
+  ]
 })
 export class LogHeaderComponent {
   private readonly envInjector = inject(EnvironmentInjector);

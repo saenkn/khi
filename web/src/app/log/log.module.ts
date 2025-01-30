@@ -39,13 +39,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { LogViewLogLineComponent } from './log-view-log-line.component';
 
 @NgModule({
-  declarations: [
-    LogBodyComponent,
-    LogHeaderComponent,
-    LogViewComponent,
-    LogViewLogLineComponent,
-    IconToggleButtonComponent,
-  ],
   imports: [
     CommonModule,
     KHICommonModule,
@@ -62,6 +55,11 @@ import { LogViewLogLineComponent } from './log-view-log-line.component';
     MatTooltipModule,
     NgComponentOutlet,
     MatSnackBarModule,
+    LogBodyComponent,
+    LogHeaderComponent,
+    LogViewComponent,
+    LogViewLogLineComponent,
+    IconToggleButtonComponent,
   ],
   providers: [
     provideHighlightOptions({

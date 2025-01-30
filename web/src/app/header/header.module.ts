@@ -19,7 +19,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { HeaderComponent } from './header.component';
 import { ToolbarComponent } from './toolbar.component';
-import { NgxEnvModule } from '@ngx-env/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegexInputComponent } from './regex-input.component';
 import { SetInputComponent } from './set-input.component';
@@ -39,15 +38,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
-  declarations: [
-    HeaderComponent,
-    ToolbarComponent,
-    SetInputComponent,
-    RegexInputComponent,
-    TitleBarComponent,
-    MainMenuComponent,
-    GraphMenuComponent,
-  ],
   imports: [
     CommonModule,
     KHICommonModule,
@@ -62,9 +52,15 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     ReactiveFormsModule,
     FormsModule,
     OverlayModule,
-    NgxEnvModule,
     MatTooltipModule,
     MatButtonToggleModule,
+    HeaderComponent,
+    ToolbarComponent,
+    SetInputComponent,
+    RegexInputComponent,
+    TitleBarComponent,
+    MainMenuComponent,
+    GraphMenuComponent,
   ],
   exports: [HeaderComponent, TitleBarComponent, GraphMenuComponent],
 })

@@ -23,7 +23,6 @@ import { FirstOrUndefined } from './first-or-null.pipe';
 import { ParsePathPipe } from './parse-path.pipe';
 import { RainbowPipe } from './rainbow.pipe';
 import { SidePaneComponent } from './components/side-pane.component';
-import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { ResolveTextPipe } from './resolve-text.pipe';
@@ -36,24 +35,24 @@ import { CaptureShiftKeyDirective } from './capture-shiftkey.directive';
 
 @NgModule({
   declarations: [
+
+  ],
+  imports: [
+    MatToolbarModule,
+    MatIconModule,
+    ClipboardModule,
+    MatTooltipModule,
     TimestampFormatPipe,
     LongTimestampFormatPipe,
     FirstOrUndefined,
     ParsePathPipe,
     RainbowPipe,
-    CssClassFormatPipe,
     ResolveTextPipe,
+    CssClassFormatPipe,
     SidePaneComponent,
     MetaTableRowComponent,
     BreaklinePipe,
     CaptureShiftKeyDirective,
-  ],
-  imports: [
-    CommonModule,
-    MatToolbarModule,
-    MatIconModule,
-    ClipboardModule,
-    MatTooltipModule,
   ],
   exports: [
     TimestampFormatPipe,

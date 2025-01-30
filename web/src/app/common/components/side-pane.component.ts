@@ -17,11 +17,19 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { ResizingCalculator } from '../resizable-pane/resizing-calculator';
 import { Observable } from 'rxjs';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'khi-side-pane',
   templateUrl: './side-pane.component.html',
   styleUrls: ['./side-pane.component.sass'],
+  imports:[
+    CommonModule,
+    MatToolbarModule,
+    MatIconModule
+  ]
 })
 export class SidePaneComponent implements OnChanges {
   static readonly DEFAULT_PANE_WIDTH = 300;

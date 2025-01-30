@@ -15,10 +15,18 @@
  */
 
 import { Component } from '@angular/core';
+import { GraphMenuComponent } from 'src/app/header/graph-menu.component';
+import { TitleBarComponent } from 'src/app/header/titlebar.component';
+import { ArchitectureGraphComponent } from './architecture-graph/architecture-graph.component';
 
 @Component({
   selector: 'graph-root',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.sass'],
+  imports:[
+    TitleBarComponent,
+    GraphMenuComponent,
+    ArchitectureGraphComponent
+  ]
 })
 export class GraphComponent {}

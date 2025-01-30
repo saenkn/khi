@@ -26,7 +26,6 @@ import { InMemoryWindowConnectionProvider } from '../services/frame-connection/w
 import { InspectionDataLoaderService } from '../services/data-loader.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { NgxEnvModule } from '@ngx-env/core';
 import { provideHttpClient } from '@angular/common/http';
 
 describe('MainMenuComponent', () => {
@@ -36,7 +35,7 @@ describe('MainMenuComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [MainMenuComponent],
-      imports: [MatDialogModule, MatIconModule, MatMenuModule, NgxEnvModule],
+      imports: [MatDialogModule, MatIconModule, MatMenuModule],
       providers: [
         WindowConnectorService,
         {

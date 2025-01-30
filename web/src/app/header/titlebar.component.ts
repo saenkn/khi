@@ -17,11 +17,21 @@
 import { Component, Input } from '@angular/core';
 import { WindowConnectorService } from '../services/frame-connection/window-connector.service';
 import { map } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { RainbowPipe } from '../common/rainbow.pipe';
 
 @Component({
   selector: 'khi-title',
   templateUrl: './titlebar.component.html',
   styleUrls: ['./titlebar.component.sass'],
+  imports:[
+    CommonModule,
+    MatIconModule,
+    MatMenuModule,
+    RainbowPipe
+  ]
 })
 export class TitleBarComponent {
   @Input()
