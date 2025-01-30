@@ -102,6 +102,24 @@ Kubernetes History Inspector (KHI) は、Kubernetesクラスタのログ可視�
 
 </details>
 
+### 権限設定
+
+#### Google Cloud
+
+以下の権限が設定されている必要があります:
+
+**必須**
+
+* `logging.logEntries.list`
+
+**Optional**
+
+こちらの権限はログフィルタを生成するダイアログで入力候補の補完を出すために使われます。
+ない場合でも補完が出ないだけで、KHIのメインの機能の利用に影響はありません。
+
+* 対象のクラスタのタイプに対するリスト権限 (e.g 例えばGKEの場合 `container.clusters.list`)
+
+
 ## ユーザーガイド
 
 [ユーザーガイド](./docs/ja/user-guide.md) をご確認ください。
