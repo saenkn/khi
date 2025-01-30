@@ -1,0 +1,11 @@
+
+# Github Actions
+.github/ @kyasbal
+
+# Golang related files
+cmd/ @kyasbal @RyuSA @jyane
+pkg/ @kyasbal @RyuSA @jyane
+test/ @kyasbal @RyuSA @jyane
+
+# Web front related files
+web/ @kyasbal @renamoo
