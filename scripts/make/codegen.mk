@@ -12,3 +12,7 @@ web/angular.json: scripts/generate-angular-json.sh web/angular-template.json web
 # These frontend files are generated from Golang template.
 web/src/app/generated.sass web/src/app/generated.ts: pkg/model/enum/log_type.go pkg/model/enum/parent_relationship.go pkg/model/enum/revision_state.go pkg/model/enum/severity.go pkg/model/enum/verb.go 
 	go run ./scripts/frontend-codegen
+
+.PHONY=add-licenses
+add-licenses:
+	$(GOPATH)/bin/addlicense  -c "Google LLC" -l apache .
