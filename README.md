@@ -59,8 +59,8 @@ This makes it an invaluable tool for troubleshooting complex issues that span mu
 - Latest Google Chrome
 
 > [!IMPORTANT]
-> We only test KHI with the latest Google Chrome. 
-> KHI may work with the other browser, but we will not support even if it won't work with the other browser.
+> We only test KHI with on the latest version of Google Chrome.
+> KHI may work with other browsers, but we do not provide support if it does not.
 
 #### Run KHI
 
@@ -77,7 +77,7 @@ This makes it an invaluable tool for troubleshooting complex issues that span mu
 >```
 
 > [!NOTE]
-> The container image source may change in the soon future. #21
+> The container image source may change in the near future. #21
 
 For more details, please try [Getting started](./docs/en/getting-started.md).
 
