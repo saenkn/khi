@@ -26,6 +26,6 @@ Steps to reproduce the behavior:
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**[Image version](https://github.com/GoogleCloudPlatform/khi/pkgs/container/khi) used:**
+**[Image version](https://github.com/GoogleCloudPlatform/khi/pkgs/container/khi) used**: 
 
-[ ] I use the latest Chrome when I observed this issue
+- [ ] I use the latest Chrome when I observed this issue
