@@ -23,10 +23,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   templateUrl: './inspection-metadata.component.html',
   styleUrls: ['./inspection-metadata.component.sass'],
-  imports:[
-    CommonModule,
-    MatCardModule
-  ]
+  imports: [CommonModule, MatCardModule],
 })
 export class InspectionMetadataDialogComponent {
   constructor(

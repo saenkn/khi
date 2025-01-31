@@ -23,11 +23,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   selector: 'khi-icon-toggle-button',
   templateUrl: './icon-toggle-button.component.html',
   styleUrls: ['./icon-toggle-button.component.sass'],
-  imports:[
-    CommonModule,
-    MatTooltipModule,
-    MatIconModule
-  ]
+  imports: [CommonModule, MatTooltipModule, MatIconModule],
 })
 export class IconToggleButtonComponent {
   @Input()

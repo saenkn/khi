@@ -47,15 +47,15 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'khi-header-toolbar',
   templateUrl: './toolbar.component.html',
   styleUrls: ['./toolbar.component.sass'],
-  imports:[
+  imports: [
     CommonModule,
     SetInputComponent,
     MatIconModule,
     OverlayModule,
     RegexInputComponent,
     MatButtonModule,
-    MatButtonToggleModule
-  ]
+    MatButtonToggleModule,
+  ],
 })
 export class ToolbarComponent implements OnInit, OnDestroy {
   private destoroyed = new Subject<void>();

@@ -52,15 +52,15 @@ import { HeaderComponent } from 'src/app/header/header.component';
 @Component({
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.sass'],
-  imports:[
+  imports: [
     CommonModule,
     HeaderComponent,
     TimelineComponent,
     SidePaneComponent,
     LogViewComponent,
     DiffViewComponent,
-    MatIconModule, 
-  ]
+    MatIconModule,
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   readonly destroyed = new Subject<void>();

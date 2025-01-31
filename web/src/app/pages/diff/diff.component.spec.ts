@@ -25,8 +25,14 @@ import {
 import { DiffPageDataSource } from 'src/app/services/frame-connection/frames/diff-page-datasource.service';
 import { TIMELINE_ANNOTATOR_RESOLVER } from 'src/app/annotator/timeline/resolver';
 import { getDefaultTimelineAnnotatorResolver } from 'src/app/annotator/timeline/default';
-import { CHANGE_PAIR_TOOL_ANNOTATOR_FOR_FLOATING_PAGE_RESOLVER, CHANGE_PAIR_TOOL_ANNOTATOR_RESOLVER } from 'src/app/annotator/change-pair-tool/resolver';
-import { getDefaultChangePairToolAnnotatorResolver, getDefaultChangePairToolAnnotatorResolverForFloatingPage } from 'src/app/annotator/change-pair-tool/default';
+import {
+  CHANGE_PAIR_TOOL_ANNOTATOR_FOR_FLOATING_PAGE_RESOLVER,
+  CHANGE_PAIR_TOOL_ANNOTATOR_RESOLVER,
+} from 'src/app/annotator/change-pair-tool/resolver';
+import {
+  getDefaultChangePairToolAnnotatorResolver,
+  getDefaultChangePairToolAnnotatorResolverForFloatingPage,
+} from 'src/app/annotator/change-pair-tool/default';
 import { CHANGE_PAIR_ANNOTATOR_RESOLVER } from 'src/app/annotator/change-pair/resolver';
 import { getDefaultChangePairAnnotatorResolver } from 'src/app/annotator/change-pair/default';
 

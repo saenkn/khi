@@ -73,7 +73,10 @@ import { ToTextReferenceFromKHIFileBinary } from '../common/loader/reference-typ
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NavigatorComponent } from './navigator/navigator.component';
-import { LongTimestampFormatPipe, TimestampFormatPipe } from '../common/timestamp-format.pipe';
+import {
+  LongTimestampFormatPipe,
+  TimestampFormatPipe,
+} from '../common/timestamp-format.pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { KHICommonModule } from '../common/common.module';
 
@@ -127,15 +130,15 @@ const DEFAULT_HOVER_VIEW_STATE: HoverViewState = {
     TimelinesScrollStrategy,
     TimelineRendererService,
   ],
-  imports:[
+  imports: [
     CommonModule,
     KHICommonModule,
     MatTooltipModule,
     NavigatorComponent,
     LongTimestampFormatPipe,
     TimestampFormatPipe,
-    MatIconModule
-  ]
+    MatIconModule,
+  ],
 })
 export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   /**

@@ -26,7 +26,10 @@ import {
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
 import { map, Observable } from 'rxjs';
 import {
   filteElementsByIncludedSubstring,
@@ -43,7 +46,7 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'khi-header-set-input',
   templateUrl: './set-input.component.html',
   styleUrls: ['./set-input.component.sass'],
-  imports:[
+  imports: [
     CommonModule,
     MatFormFieldModule,
     MatInputModule,
@@ -52,8 +55,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatButtonModule,
     ReactiveFormsModule,
     MatAutocompleteModule,
-    MatTooltipModule
-  ]
+    MatTooltipModule,
+  ],
 })
 export class SetInputComponent implements OnInit {
   @Input()

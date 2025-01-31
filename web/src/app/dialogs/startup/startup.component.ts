@@ -83,12 +83,7 @@ export type TaskListViewModel = {
   templateUrl: './startup.component.html',
   styleUrls: ['./startup.component.sass'],
   standalone: true,
-  imports: [
-    CommonModule,
-    MatIconModule,
-    MatTooltipModule,
-    MatButtonModule,
-  ],
+  imports: [CommonModule, MatIconModule, MatTooltipModule, MatButtonModule],
 })
 export class StartupDialogComponent {
   /**
@@ -104,7 +99,7 @@ export class StartupDialogComponent {
 
   tasks = this.backendConnection.tasks();
 
-  version = VERSION
+  version = VERSION;
 
   taskListViewModel = combineLatest([
     interval(StartupDialogComponent.UI_TIME_REFRESH_INTERVAL).pipe(

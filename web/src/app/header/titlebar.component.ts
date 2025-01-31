@@ -28,19 +28,19 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'khi-title',
   templateUrl: './titlebar.component.html',
   styleUrls: ['./titlebar.component.sass'],
-  imports:[
+  imports: [
     CommonModule,
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
-    RainbowPipe
-  ]
+    RainbowPipe,
+  ],
 })
 export class TitleBarComponent {
   @Input()
   pageName = 'N/A';
 
-  version = VERSION
+  version = VERSION;
 
   mainPageConenctionEstablished =
     this.windowConnector.mainPageConenctionEstablished;

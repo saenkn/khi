@@ -25,11 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'khi-side-pane',
   templateUrl: './side-pane.component.html',
   styleUrls: ['./side-pane.component.sass'],
-  imports:[
-    CommonModule,
-    MatToolbarModule,
-    MatIconModule
-  ]
+  imports: [CommonModule, MatToolbarModule, MatIconModule],
 })
 export class SidePaneComponent implements OnChanges {
   static readonly DEFAULT_PANE_WIDTH = 300;

@@ -77,14 +77,14 @@ type DiffViewViewModel = {
   selector: 'khi-diff-view',
   templateUrl: './diff-view.component.html',
   styleUrls: ['./diff-view.component.sass'],
-  imports:[
+  imports: [
     CommonModule,
     ScrollingModule,
     CdkVirtualScrollViewport,
     ParsePrincipalPipe,
     TimestampFormatPipe,
     UnifiedDiffComponent,
-    HighlightModule
+    HighlightModule,
   ],
   providers: [
     { provide: VIRTUAL_SCROLL_STRATEGY, useClass: DiffViewScrollStrategy },

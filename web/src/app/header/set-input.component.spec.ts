@@ -39,7 +39,7 @@ describe('SetInputComponent', () => {
       >
       </khi-header-set-input>
     `,
-    imports:[SetInputComponent]
+    imports: [SetInputComponent],
   })
   class TestSetInputWrapperComponent {
     choices = new Set(['foo', 'bar', 'qux']);
@@ -55,9 +55,7 @@ describe('SetInputComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        NoopAnimationsModule,
-      ],
+      imports: [NoopAnimationsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestSetInputWrapperComponent);

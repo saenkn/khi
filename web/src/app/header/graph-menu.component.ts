@@ -24,11 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'khi-graph-menu',
   templateUrl: './graph-menu.component.html',
   styleUrls: ['./graph-menu.component.sass'],
-  imports:[
-    MatMenuModule,
-    MatIconModule,
-    MatButtonModule
-  ]
+  imports: [MatMenuModule, MatIconModule, MatButtonModule],
 })
 export class GraphMenuComponent {
   constructor(private downloadService: DownloadService) {}

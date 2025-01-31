@@ -23,10 +23,6 @@ import { ToolbarComponent } from './toolbar.component';
   selector: 'khi-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.sass'],
-  imports:[
-    TitleBarComponent,
-    MainMenuComponent,
-    ToolbarComponent
-  ]
+  imports: [TitleBarComponent, MainMenuComponent, ToolbarComponent],
 })
 export class HeaderComponent {}

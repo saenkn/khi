@@ -22,8 +22,7 @@ describe('SidePaneComponent', () => {
   let fixture: ComponentFixture<SidePaneComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-    }).compileComponents();
+    await TestBed.configureTestingModule({}).compileComponents();
 
     fixture = TestBed.createComponent(SidePaneComponent);
     component = fixture.componentInstance;

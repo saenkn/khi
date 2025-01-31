@@ -34,7 +34,11 @@ import {
   InspectionType,
 } from 'src/app/common/schema/api-types';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { InspectionMetadataFormField } from 'src/app/common/schema/metadata-types';
 import {
   BACKEND_API,
@@ -81,7 +85,7 @@ type FormFieldViewModel = {
 @Component({
   templateUrl: './new-inspection.component.html',
   styleUrls: ['./new-inspection.component.sass'],
-  imports:[
+  imports: [
     CommonModule,
     KHICommonModule,
     MatInputModule,
@@ -92,8 +96,8 @@ type FormFieldViewModel = {
     MatIconModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatAutocompleteModule
-  ]
+    MatAutocompleteModule,
+  ],
 })
 export class NewInspectionDialogComponent implements OnDestroy {
   private destoroyed = new Subject<void>();

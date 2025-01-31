@@ -24,10 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'khi-main-menu',
   templateUrl: './main-menu.component.html',
   styleUrls: ['./main-menu.component.sass'],
-  imports:[
-    MatIconModule,
-    MatButtonModule,
-  ]
+  imports: [MatIconModule, MatButtonModule],
 })
 export class MainMenuComponent {
   constructor(private readonly dialog: MatDialog) {}

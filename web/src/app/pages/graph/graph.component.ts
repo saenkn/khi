@@ -23,10 +23,6 @@ import { ArchitectureGraphComponent } from './architecture-graph/architecture-gr
   selector: 'graph-root',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.sass'],
-  imports:[
-    TitleBarComponent,
-    GraphMenuComponent,
-    ArchitectureGraphComponent
-  ]
+  imports: [TitleBarComponent, GraphMenuComponent, ArchitectureGraphComponent],
 })
 export class GraphComponent {}

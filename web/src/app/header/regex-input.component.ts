@@ -25,12 +25,12 @@ import { MatInputModule } from '@angular/material/input';
   selector: 'khi-header-regex-input',
   templateUrl: './regex-input.component.html',
   styleUrls: ['./regex-input.component.sass'],
-  imports:[
+  imports: [
     CommonModule,
     MatFormFieldModule,
     MatInputModule,
-    ReactiveFormsModule
-  ]
+    ReactiveFormsModule,
+  ],
 })
 export class RegexInputComponent {
   @Input()

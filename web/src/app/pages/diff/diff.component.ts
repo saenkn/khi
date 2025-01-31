@@ -29,11 +29,7 @@ import { TimelineEntry } from 'src/app/store/timeline';
   selector: 'khi-diff-page',
   templateUrl: './diff.component.html',
   styleUrls: ['./diff.component.sass'],
-  imports:[
-    CommonModule,
-    TitleBarComponent,
-    SideBySideDiffComponent
-  ]
+  imports: [CommonModule, TitleBarComponent, SideBySideDiffComponent],
 })
 export class DiffComponent {
   private readonly envInjector = inject(EnvironmentInjector);

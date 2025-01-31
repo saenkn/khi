@@ -27,12 +27,7 @@ import { ResolveTextPipe } from '../common/resolve-text.pipe';
   selector: 'khi-log-body',
   templateUrl: './body.component.html',
   styleUrls: ['./body.component.sass'],
-  imports:[
-    CommonModule,
-    LogHeaderComponent,
-    HighlightModule,
-    ResolveTextPipe
-  ]
+  imports: [CommonModule, LogHeaderComponent, HighlightModule, ResolveTextPipe],
 })
 export class LogBodyComponent {
   private readonly dataStore = inject(InspectionDataStoreService);

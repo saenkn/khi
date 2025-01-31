@@ -25,10 +25,7 @@ import {
 @Component({
   templateUrl: './progress.component.html',
   styleUrls: ['./progress.component.sass'],
-  imports:[
-    CommonModule,
-    MatProgressBarModule
-  ]
+  imports: [CommonModule, MatProgressBarModule],
 })
 export class ProgressDialogComponent {
   public currentStatus = this.progressObserver.status();

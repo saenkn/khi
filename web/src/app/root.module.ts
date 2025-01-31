@@ -39,7 +39,7 @@ import {
 } from './services/frame-connection/window-connector.service';
 import { BroadcastChannelWindowConnectionProvider } from './services/frame-connection/window-connection-provider.service';
 import { KHITitleStrategy } from './services/title-strategy.service';
-import {  MatIconRegistry } from '@angular/material/icon';
+import { MatIconRegistry } from '@angular/material/icon';
 import { HttpClientModule } from '@angular/common/http';
 import { POPUP_MANAGER } from './services/popup/popup-manager';
 import { PopupManagerImpl } from './services/popup/popup-manager-impl';
@@ -78,14 +78,18 @@ import { LOG_TOOL_ANNOTATOR_RESOLVER } from './annotator/log-tool/resolver';
 import { getDefaultLogToolAnnotatorResolver } from './annotator/log-tool/default';
 import { TIMELINE_ANNOTATOR_RESOLVER } from './annotator/timeline/resolver';
 import { getDefaultTimelineAnnotatorResolver } from './annotator/timeline/default';
-import { CHANGE_PAIR_TOOL_ANNOTATOR_FOR_FLOATING_PAGE_RESOLVER, CHANGE_PAIR_TOOL_ANNOTATOR_RESOLVER } from './annotator/change-pair-tool/resolver';
-import { getDefaultChangePairToolAnnotatorResolver, getDefaultChangePairToolAnnotatorResolverForFloatingPage } from './annotator/change-pair-tool/default';
+import {
+  CHANGE_PAIR_TOOL_ANNOTATOR_FOR_FLOATING_PAGE_RESOLVER,
+  CHANGE_PAIR_TOOL_ANNOTATOR_RESOLVER,
+} from './annotator/change-pair-tool/resolver';
+import {
+  getDefaultChangePairToolAnnotatorResolver,
+  getDefaultChangePairToolAnnotatorResolverForFloatingPage,
+} from './annotator/change-pair-tool/default';
 import { CHANGE_PAIR_ANNOTATOR_RESOLVER } from './annotator/change-pair/resolver';
 import { getDefaultChangePairAnnotatorResolver } from './annotator/change-pair/default';
 @NgModule({
-  declarations: [
-    RootComponent,
-  ],
+  declarations: [RootComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

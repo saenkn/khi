@@ -67,13 +67,13 @@ interface LogViewSelectionMoveCommand {
   selector: 'khi-log-view',
   templateUrl: './log-view.component.html',
   styleUrls: ['./log-view.component.sass'],
-  imports:[
+  imports: [
     CommonModule,
     ScrollingModule,
     IconToggleButtonComponent,
     CdkVirtualScrollViewport,
     LogViewLogLineComponent,
-    LogBodyComponent
+    LogBodyComponent,
   ],
   providers: [
     { provide: VIRTUAL_SCROLL_STRATEGY, useClass: LogViewScrollingStrategy },

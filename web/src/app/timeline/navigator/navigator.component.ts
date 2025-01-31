@@ -38,10 +38,7 @@ interface NavigatorLayer {
   templateUrl: './navigator.component.html',
   styleUrl: './navigator.component.sass',
   selector: 'khi-timeline-navigator',
-  imports:[
-    CommonModule,
-    MatIconModule,
-  ]
+  imports: [CommonModule, MatIconModule],
 })
 export class NavigatorComponent {
   private readonly extensionStore = inject(EXTENSION_STORE);

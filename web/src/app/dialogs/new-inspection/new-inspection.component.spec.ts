@@ -38,9 +38,7 @@ describe('NewInspectionDialogTest', () => {
       ['inspectionTypes'],
     );
     await TestBed.configureTestingModule({
-      imports: [
-        NoopAnimationsModule,
-      ],
+      imports: [NoopAnimationsModule],
       providers: [
         {
           provide: MatDialogRef,
