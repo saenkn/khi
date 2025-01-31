@@ -15,7 +15,6 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRouteSnapshot, RouterModule, UrlTree } from '@angular/router';
 import { SessionChildGuard, SessionHostGuard } from './app.route.guard';
 import { lastValueFrom } from 'rxjs';
@@ -38,7 +37,7 @@ function createActivateRouteSnapshotWithSessionId(
 describe('SessionHostGuard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterModule, NoopAnimationsModule, MatSnackBarModule],
+      imports: [RouterModule, NoopAnimationsModule],
       providers: [
         WindowConnectorService,
         {
@@ -91,7 +90,7 @@ describe('SessionHostGuard', () => {
 describe('SessionChildGuard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [MatSnackBarModule, RouterModule, NoopAnimationsModule],
+      imports: [RouterModule, NoopAnimationsModule],
       providers: [
         WindowConnectorService,
         {

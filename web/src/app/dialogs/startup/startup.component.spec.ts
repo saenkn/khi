@@ -42,7 +42,6 @@ describe('StartupDialogComponent', () => {
     );
     backendConnectionSpy.tasks.and.returnValue(taskListSubject);
     await TestBed.configureTestingModule({
-      imports: [StartupDialogComponent],
       providers: [
         ...ProgressDialogService.providers(),
         {

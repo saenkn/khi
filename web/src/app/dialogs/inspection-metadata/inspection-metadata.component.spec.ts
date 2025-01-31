@@ -15,7 +15,7 @@
  */
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { InspectionMetadataDialogComponent } from './inspection-metadata.component';
 import { provideHttpClient } from '@angular/common/http';
@@ -26,8 +26,6 @@ describe('TaskMetadataViewDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [InspectionMetadataDialogComponent],
-      imports: [MatDialogModule],
       providers: [
         {
           provide: MAT_DIALOG_DATA,

@@ -28,8 +28,6 @@ describe('LogHeaderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [LogHeaderComponent],
-      imports: [],
       providers: [
         {
           provide: WINDOW_CONNECTION_PROVIDER,

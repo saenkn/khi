@@ -16,19 +16,13 @@
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MetaTableRowComponent } from './meta-table-row.component';
-import { ClipboardModule } from '@angular/cdk/clipboard';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 describe('MetaTableRowComponent', () => {
   let fixture: ComponentFixture<MetaTableRowComponent>;
   let component: MetaTableRowComponent;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [MetaTableRowComponent],
-      imports: [MatIconModule, MatTooltipModule, ClipboardModule],
-    });
+    await TestBed.configureTestingModule({});
 
     fixture = TestBed.createComponent(MetaTableRowComponent);
     component = fixture.componentInstance;
