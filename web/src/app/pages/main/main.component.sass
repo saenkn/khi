@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+@use "sass:color"
 @use "../../common"
 @use '@angular/material' as mat
 
@@ -47,9 +48,9 @@ $BUTTON_COLOR_INACTIVE: black
     background-color: $BUTTON_BACKGROUND_INACTIVE
     color: $BUTTON_COLOR_INACTIVE
     &:hover
-        background-color: darken($BUTTON_BACKGROUND_INACTIVE,10%)
+        background-color: color.adjust($BUTTON_BACKGROUND_INACTIVE,$lightness: -10%)
     &.active
         background-color: $BUTTON_BACKGROUND_ACTIVE
         color: $BUTTON_COLOR_ACTIVE
         &:hover
-            background-color: lighten($BUTTON_BACKGROUND_ACTIVE,10%)
+            background-color: color.adjust($BUTTON_BACKGROUND_ACTIVE,$lightness: 10%)

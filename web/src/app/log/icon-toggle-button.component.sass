@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+@use "sass:color"
 @use '@angular/material' as mat
 @use '../color-palette.sass' as cp
 
@@ -35,14 +36,14 @@ $disabled-text: mat.m2-get-color-from-palette(cp.$khi-disabled-palette,'darker-c
     height: $size
     &:hover
         cursor: pointer
-        background-color: darker($normal-background,5%)
+        background-color: color.adjust($normal-background,$lightness: -5%)
     background-color: $normal-background
     color: $normal-text
     &.selected
         background-color: $selected-background
         color: $selected-text
         &:hover
-            background-color: lighten($selected-background,5%)
+            background-color: color.adjust($selected-background,$lightness: 5%)
     &.disabled
         background-color: $disabled-background
         color: $disabled-text

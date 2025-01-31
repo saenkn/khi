@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+@use 'sass:color'
 @use "sass:map"
 @use '../generated' as gen
-@use 'sass:color'
 
 $timeline-border-horizontal-color: rgba(0,0,0,0.1)
 $layer-heights: ("kind":25px,"namespace":25px,"name": 30px,"subresource":22px)
@@ -44,15 +44,15 @@ $timeruler-tip: rgba(0,0,0,0.2)
         border-radius: 3px
         margin-right: 5px
     &.selected p
-        background-color: color.mix(map.get($layer-background,$layer-type),darken($timeline-selection-tint-color,30%),60%)
+        background-color: color.mix(map.get($layer-background,$layer-type),color.adjust($timeline-selection-tint-color,$lightness: -30%),60%)
     &.children-of-selected p
         background-color: color.mix(map.get($layer-background,$layer-type),$timeline-selection-tint-color,60%)
     &.highlight p
         background-color: color.mix(map.get($layer-background,$layer-type),$timeline-selection-tint-color,40%)
     &.selected
-        border-bottom: 1px solid darken($timeline-selection-tint-color,30%)
-        border-top: 1px solid darken($timeline-selection-tint-color,30%)
-        border-left: 5px solid darken($timeline-selection-tint-color,30%)
+        border-bottom: 1px solid color.adjust($timeline-selection-tint-color,$lightness: -30%)
+        border-top: 1px solid color.adjust($timeline-selection-tint-color,$lightness: -30%)
+        border-left: 5px solid color.adjust($timeline-selection-tint-color,$lightness: -30%)
     p
         margin: 0
         background-color: map.get($layer-background,$layer-type)
@@ -76,7 +76,7 @@ $timeruler-tip: rgba(0,0,0,0.2)
 
 @mixin timeline-body-color($layer-type)
     .timeline-body
-        background-color: lighten(map.get($layer-background,$layer-type),$timeline-body-background-color-tint)
+        background-color: color.adjust(map.get($layer-background,$layer-type),$lightness: $timeline-body-background-color-tint)
 
 .tl-header-kind
     @include layer-header-style("kind")

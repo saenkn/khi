@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@use "sass:color"
 @use '@angular/material' as mat
 
 $resizer-color: mat.m2-get-color-from-palette(mat.$m2-gray-palette,500)
@@ -32,7 +32,7 @@ $FONT_SIZE: 14px
     background-color: $resizer-color
     &:hover
         cursor: col-resize
-        background-color: darken($resizer-color, 10%)
+        background-color: color.adjust($resizer-color,$lightness: -10%)
 
 .header
     grid-area: header

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@use "sass:color"
 @use '../common.sass' as common
 .container
     background: white
@@ -49,11 +49,11 @@ mat-form-field
     &.only
         color: green
         &:hover
-            color: darken(green,10%)
+            color: color.adjust(green,$lightness: -10%)
     &.remove
         color: red
         &:hover
-            color: darken(red,10%)
+            color: color.adjust(red,$lightness: -10%)
 .chip-button
     &.only
         padding-right: 4px !important
