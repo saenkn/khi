@@ -22,6 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { RainbowPipe } from '../common/rainbow.pipe';
 import { VERSION } from 'src/environments/version';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'khi-title',
@@ -30,6 +31,7 @@ import { VERSION } from 'src/environments/version';
   imports:[
     CommonModule,
     MatIconModule,
+    MatButtonModule,
     MatMenuModule,
     RainbowPipe
   ]

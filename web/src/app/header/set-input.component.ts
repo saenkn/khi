@@ -37,6 +37,7 @@ import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'khi-header-set-input',
   templateUrl: './set-input.component.html',
@@ -44,6 +45,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   imports:[
     CommonModule,
     MatFormFieldModule,
+    MatInputModule,
     MatChipsModule,
     MatIconModule,
     ReactiveFormsModule,

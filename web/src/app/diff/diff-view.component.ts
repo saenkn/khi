@@ -37,6 +37,7 @@ import { SelectionManagerService } from '../services/selection-manager.service';
 import {
   CdkVirtualScrollViewport,
   FixedSizeVirtualScrollStrategy,
+  ScrollingModule,
   VIRTUAL_SCROLL_STRATEGY,
 } from '@angular/cdk/scrolling';
 import { TIMELINE_ANNOTATOR_RESOLVER } from '../annotator/timeline/resolver';
@@ -78,6 +79,7 @@ type DiffViewViewModel = {
   styleUrls: ['./diff-view.component.sass'],
   imports:[
     CommonModule,
+    ScrollingModule,
     CdkVirtualScrollViewport,
     ParsePrincipalPipe,
     TimestampFormatPipe,

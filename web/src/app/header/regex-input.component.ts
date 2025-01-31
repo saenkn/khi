@@ -19,6 +19,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RegexValidator } from './regex-validator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'khi-header-regex-input',
@@ -27,6 +28,7 @@ import { CommonModule } from '@angular/common';
   imports:[
     CommonModule,
     MatFormFieldModule,
+    MatInputModule,
     ReactiveFormsModule
   ]
 })

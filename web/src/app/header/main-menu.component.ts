@@ -18,13 +18,15 @@ import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { StartupDialogComponent } from '../dialogs/startup/startup.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'khi-main-menu',
   templateUrl: './main-menu.component.html',
   styleUrls: ['./main-menu.component.sass'],
   imports:[
-    MatIconModule
+    MatIconModule,
+    MatButtonModule,
   ]
 })
 export class MainMenuComponent {

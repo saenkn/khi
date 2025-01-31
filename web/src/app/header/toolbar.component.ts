@@ -41,6 +41,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { RegexInputComponent } from './regex-input.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'khi-header-toolbar',
@@ -52,6 +53,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     MatIconModule,
     OverlayModule,
     RegexInputComponent,
+    MatButtonModule,
     MatButtonToggleModule
   ]
 })

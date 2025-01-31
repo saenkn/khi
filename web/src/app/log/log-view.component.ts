@@ -17,6 +17,7 @@
 import {
   CdkVirtualScrollViewport,
   FixedSizeVirtualScrollStrategy,
+  ScrollingModule,
   VIRTUAL_SCROLL_STRATEGY,
 } from '@angular/cdk/scrolling';
 import {
@@ -68,6 +69,7 @@ interface LogViewSelectionMoveCommand {
   styleUrls: ['./log-view.component.sass'],
   imports:[
     CommonModule,
+    ScrollingModule,
     IconToggleButtonComponent,
     CdkVirtualScrollViewport,
     LogViewLogLineComponent,

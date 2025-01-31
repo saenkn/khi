@@ -18,6 +18,7 @@ import { Component } from '@angular/core';
 import { DownloadService } from '../pages/graph/services/donwload-service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'khi-graph-menu',
@@ -25,7 +26,8 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./graph-menu.component.sass'],
   imports:[
     MatMenuModule,
-    MatIconModule
+    MatIconModule,
+    MatButtonModule
   ]
 })
 export class GraphMenuComponent {
