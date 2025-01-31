@@ -17,7 +17,7 @@
 @use '@angular/material' as mat
 
 $foreground: white
-$background: mat.get-color-from-palette(mat.$indigo-palette,500)
+$background: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,500)
 
 $menu-width: 135px
 
@@ -44,7 +44,7 @@ $menu-width: 135px
     display: flex
     justify-content: center
     align-items: center
-    background-color: mat.get-color-from-palette(mat.$yellow-palette,900)
+    background-color: mat.m2-get-color-from-palette(mat.$yellow-palette,900)
     color: $foreground
     border-radius: 4px
     margin: auto 10px
@@ -56,8 +56,8 @@ $menu-width: 135px
     display: flex
     justify-content: center
     align-items: center
-    background-color: mat.get-color-from-palette(mat.$indigo-palette,100)
-    color: mat.get-color-from-palette(mat.$indigo-palette,800)
+    background-color: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,100)
+    color: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,800)
     border-radius: 4px
     margin: auto 10px
     padding: 3px 5px
@@ -68,8 +68,8 @@ $menu-width: 135px
     display: flex
     justify-content: center
     align-items: center
-    background-color: mat.get-color-from-palette(mat.$indigo-palette,100)
-    color: mat.get-color-from-palette(mat.$indigo-palette,800)
+    background-color: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,100)
+    color: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,800)
     border-radius: 4px
     margin: auto 10px
     padding: 3px 5px
@@ -78,11 +78,11 @@ $menu-width: 135px
         justify-content: center
         align-items: center
         margin: 0
-        color: mat.get-color-from-palette(mat.$indigo-palette,800)
+        color: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,800)
     .icon
         margin: 0 5px 0 0
     .session-count
-        background-color: mat.get-color-from-palette(mat.$indigo-palette,800)
+        background-color: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,800)
         color: white
         border-radius: 8px
         padding: 0 4px
@@ -93,12 +93,12 @@ $menu-width: 135px
     color: $foreground
     background-color: $background
     &:hover
-        background-color: mat.get-color-from-palette(mat.$indigo-palette,400)
+        background-color: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,400)
 
 .menu-groups
     flex: 1
     margin: 0 20px
 
 .connection-error
-    color: mat.get-color-from-palette(mat.$red-palette,400)
+    color: mat.m2-get-color-from-palette(mat.$red-palette,400)
     font-weight: 800

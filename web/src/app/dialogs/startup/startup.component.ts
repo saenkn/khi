@@ -48,6 +48,7 @@ import {
   PROGRESS_DIALOG_STATUS_UPDATOR,
   ProgressDialogStatusUpdator,
 } from 'src/app/services/progress/progress-interface';
+import { VERSION } from 'src/environments/version';
 
 export type ProgressBarViewModel = {
   id: string;
@@ -102,6 +103,8 @@ export class StartupDialogComponent {
   documentUrl = environment.documentUrl;
 
   tasks = this.backendConnection.tasks();
+
+  version = VERSION
 
   taskListViewModel = combineLatest([
     interval(StartupDialogComponent.UI_TIME_REFRESH_INTERVAL).pipe(

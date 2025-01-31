@@ -21,6 +21,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { RainbowPipe } from '../common/rainbow.pipe';
+import { VERSION } from 'src/environments/version';
 
 @Component({
   selector: 'khi-title',
@@ -36,6 +37,8 @@ import { RainbowPipe } from '../common/rainbow.pipe';
 export class TitleBarComponent {
   @Input()
   pageName = 'N/A';
+
+  version = VERSION
 
   mainPageConenctionEstablished =
     this.windowConnector.mainPageConenctionEstablished;

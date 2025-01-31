@@ -17,8 +17,8 @@
 @use '@angular/material' as mat
 
 $FONT_SIZE: 12px
-$LABEL_BACKGROUND: mat.get-color-from-palette(mat.$indigo-palette,600)
-$BACKGROUND: mat.get-color-from-palette(mat.$indigo-palette,100)
+$LABEL_BACKGROUND: mat.m2-get-color-from-palette(mat.$indigo-palette,600)
+$BACKGROUND: mat.m2-get-color-from-palette(mat.$indigo-palette,100)
 $LABEL_COLOR: white
 $VALUE_COLOR: black
 .label
@@ -68,4 +68,4 @@ $VALUE_COLOR: black
         padding: 0 3px
     &.current
         .index
-            background-color: mat.get-color-from-palette(mat.$indigo-palette,400)
+            background-color: mat.m2-get-color-from-palette(mat.$indigo-palette,400)
