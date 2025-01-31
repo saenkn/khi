@@ -44,3 +44,4 @@ Thumbs.db
 # Ignore generated files
 src/app/generated.*
 angular.json
+src/environments/version.*.ts
