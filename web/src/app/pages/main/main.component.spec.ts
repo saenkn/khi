@@ -18,11 +18,7 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppComponent } from './main.component';
-import { DiffModule } from '../../diff/diff.module';
-import { HeaderModule } from '../../header/header.module';
-import { LogModule } from '../../log/log.module';
 import { InspectionDataLoaderService } from '../../services/data-loader.service';
-import { TimelineModule } from '../../timeline/timeline.module';
 import {
   WINDOW_CONNECTION_PROVIDER,
   WindowConnectorService,
@@ -51,10 +47,6 @@ describe('AppComponent', () => {
       declarations: [AppComponent],
       imports: [
         MatDialogModule,
-        HeaderModule,
-        TimelineModule,
-        LogModule,
-        DiffModule,
         MatIconModule,
         MatSnackBarModule,
       ],
