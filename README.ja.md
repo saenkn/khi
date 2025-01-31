@@ -83,7 +83,7 @@ Kubernetes History Inspector (KHI) は、Kubernetesクラスタのログ可視�
 
 #### 動作環境
 - Go 1.23.*
-- Node.js環境 18.19.*
+- Node.js環境 22.13.*
 - [`gcloud` CLI](https://cloud.google.com/sdk/docs/install)
 - Google Chrome (最新版)
 

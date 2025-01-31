@@ -88,7 +88,7 @@ For more details, please try [Getting started](./docs/en/getting-started.md).
 
 #### Prerequisites
 - Go 1.23.*
-- Node.js environment 18.19.*
+- Node.js environment 22.13.*
 - [`gcloud` CLI](https://cloud.google.com/sdk/docs/install)
 
 #### Initialization (one-time setup)
