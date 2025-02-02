@@ -15,7 +15,7 @@
  */
 
 import { Component, Inject, OnDestroy, ViewChild } from '@angular/core';
-import { MatStepper } from '@angular/material/stepper';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import {
   BehaviorSubject,
   Subject,
@@ -33,8 +33,12 @@ import {
   InspectionMetadataInDryrun,
   InspectionType,
 } from 'src/app/common/schema/api-types';
-import { FormControl, FormGroup } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { InspectionMetadataFormField } from 'src/app/common/schema/metadata-types';
 import {
   BACKEND_API,
@@ -46,6 +50,15 @@ import {
   EXTENSION_STORE,
   ExtensionStore,
 } from 'src/app/extensions/extension-common/extension-store';
+import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { KHICommonModule } from 'src/app/common/common.module';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 export interface NewInspectionDialogResult {
   inspectionTaskStarted: boolean;
@@ -73,6 +86,20 @@ type FormFieldViewModel = {
 @Component({
   templateUrl: './new-inspection.component.html',
   styleUrls: ['./new-inspection.component.sass'],
+  imports: [
+    CommonModule,
+    KHICommonModule,
+    MatButtonModule,
+    MatInputModule,
+    MatDialogModule,
+    MatStepperModule,
+    MatCardModule,
+    MatProgressBarModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatAutocompleteModule,
+  ],
 })
 export class NewInspectionDialogComponent implements OnDestroy {
   private destoroyed = new Subject<void>();

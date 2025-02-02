@@ -15,20 +15,13 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppComponent } from './main.component';
-import { DiffModule } from '../../diff/diff.module';
-import { HeaderModule } from '../../header/header.module';
-import { LogModule } from '../../log/log.module';
 import { InspectionDataLoaderService } from '../../services/data-loader.service';
-import { TimelineModule } from '../../timeline/timeline.module';
 import {
   WINDOW_CONNECTION_PROVIDER,
   WindowConnectorService,
 } from 'src/app/services/frame-connection/window-connector.service';
 import { InMemoryWindowConnectionProvider } from 'src/app/services/frame-connection/window-connection-provider.service';
-import { MatIconModule } from '@angular/material/icon';
 import { provideHttpClient } from '@angular/common/http';
 import { POPUP_MANAGER } from 'src/app/services/popup/popup-manager';
 import { MockPopupManager } from 'src/app/services/popup/mock';
@@ -48,16 +41,6 @@ import { ViewStateService } from 'src/app/services/view-state.service';
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AppComponent],
-      imports: [
-        MatDialogModule,
-        HeaderModule,
-        TimelineModule,
-        LogModule,
-        DiffModule,
-        MatIconModule,
-        MatSnackBarModule,
-      ],
       providers: [
         {
           provide: EXTENSION_STORE,

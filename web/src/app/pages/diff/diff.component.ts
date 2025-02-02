@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+import { CommonModule } from '@angular/common';
 import { Component, EnvironmentInjector, inject } from '@angular/core';
+import { SideBySideDiffComponent } from 'ngx-diff';
 import { Observable, map } from 'rxjs';
 import { CHANGE_PAIR_TOOL_ANNOTATOR_FOR_FLOATING_PAGE_RESOLVER } from 'src/app/annotator/change-pair-tool/resolver';
 import { CHANGE_PAIR_ANNOTATOR_RESOLVER } from 'src/app/annotator/change-pair/resolver';
 import { TIMELINE_ANNOTATOR_RESOLVER } from 'src/app/annotator/timeline/resolver';
+import { TitleBarComponent } from 'src/app/header/titlebar.component';
 import { DiffPageDataSource } from 'src/app/services/frame-connection/frames/diff-page-datasource.service';
 import { TimelineEntry } from 'src/app/store/timeline';
 
@@ -26,6 +29,7 @@ import { TimelineEntry } from 'src/app/store/timeline';
   selector: 'khi-diff-page',
   templateUrl: './diff.component.html',
   styleUrls: ['./diff.component.sass'],
+  imports: [CommonModule, TitleBarComponent, SideBySideDiffComponent],
 })
 export class DiffComponent {
   private readonly envInjector = inject(EnvironmentInjector);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@use "sass:color"
 @use '../common' as common
 @use '@angular/material' as mat
 @use '../color-palette.sass' as cp
@@ -30,7 +30,7 @@
         text-overflow: ellipsis
     .timeline-filter-wrapper
         box-sizing: border-box
-        border-right: 0.5px solid mat.get-color-from-palette(cp.$khi-menu-palette,"darker")
+        border-right: 0.5px solid mat.m2-get-color-from-palette(cp.$khi-menu-palette,"darker")
 .log-type-filter-button
     grid-column: 3
 .count-indicator
@@ -82,7 +82,7 @@
     background-color: gray
     &:hover
         cursor: row-resize
-        background-color: darken(lightgray,10% )
+        background-color: color.adjust(lightgray,$lightness: -10% )
 
 khi-log-body
     height: var(--log-body-view-height)

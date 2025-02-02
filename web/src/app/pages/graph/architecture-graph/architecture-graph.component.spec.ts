@@ -30,7 +30,6 @@ describe('ArchitectureGraphComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ArchitectureGraphComponent],
       providers: [
         WindowConnectorService,
         {

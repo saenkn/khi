@@ -17,6 +17,7 @@
 import {
   CdkVirtualScrollViewport,
   FixedSizeVirtualScrollStrategy,
+  ScrollingModule,
   VIRTUAL_SCROLL_STRATEGY,
 } from '@angular/cdk/scrolling';
 import {
@@ -47,6 +48,10 @@ import { ObservableCSSClassBinder } from '../utils/observable-css-class-binder';
 import { LogEntry } from '../store/log';
 import { TimelineEntry } from '../store/timeline';
 import { monitorElementHeight } from '../utils/observable-util';
+import { IconToggleButtonComponent } from './icon-toggle-button.component';
+import { CommonModule } from '@angular/common';
+import { LogViewLogLineComponent } from './log-view-log-line.component';
+import { LogBodyComponent } from './body.component';
 
 class LogViewScrollingStrategy extends FixedSizeVirtualScrollStrategy {
   constructor() {
@@ -62,6 +67,14 @@ interface LogViewSelectionMoveCommand {
   selector: 'khi-log-view',
   templateUrl: './log-view.component.html',
   styleUrls: ['./log-view.component.sass'],
+  imports: [
+    CommonModule,
+    ScrollingModule,
+    IconToggleButtonComponent,
+    CdkVirtualScrollViewport,
+    LogViewLogLineComponent,
+    LogBodyComponent,
+  ],
   providers: [
     { provide: VIRTUAL_SCROLL_STRATEGY, useClass: LogViewScrollingStrategy },
   ],

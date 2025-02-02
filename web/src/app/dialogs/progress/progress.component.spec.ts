@@ -15,8 +15,6 @@
  */
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressBarHarness } from '@angular/material/progress-bar/testing';
 
 import { ProgressDialogComponent } from './progress.component';
@@ -45,8 +43,6 @@ describe('ProgressOverlayComponent', () => {
     progressObserverStatus = new Subject();
     progressObserverSpy.status.and.returnValue(progressObserverStatus);
     await TestBed.configureTestingModule({
-      declarations: [ProgressDialogComponent],
-      imports: [MatDialogModule, MatProgressBarModule],
       providers: [
         {
           provide: PROGRESS_DIALOG_STATUS_OBSERVER,

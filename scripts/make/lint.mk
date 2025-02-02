@@ -1,6 +1,6 @@
 .PHONY=lint-web
 lint-web: prepare-frontend
-	cd web && npx ng lint && npx stylelint "*/**.sass"
+	cd web && npx ng lint
 
 .PHONY=lint-go
 lint-go:

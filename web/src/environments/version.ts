@@ -1,5 +1,5 @@
 /**
- * Copyright 2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,4 @@
  * limitations under the License.
  */
 
-/**
- * Note: Use ngx-env only for the case that the variable needs to be switch frequently on local development.
- * If the flag is correspoding to the build configuration, use environment files instead.
- */
-
-/* eslint-disable */
-declare var process: {
-  env: {
-    NG_APP_BACKEND_URL_PREFIX: string;
-    NG_APP_VERSION: string;
-    // Replace the line below with your environment variable for better type checking
-    [key: string]: any;
-  };
-};
+export const VERSION = 'development';

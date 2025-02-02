@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-import { OverlayModule } from '@angular/cdk/overlay';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { RegexInputComponent } from './regex-input.component';
 
 import { ToolbarComponent } from './toolbar.component';
 import {
@@ -34,7 +29,6 @@ import {
 } from '../services/timeline-filter.service';
 import { InspectionDataStoreService } from '../services/inspection-data-store.service';
 import { ViewStateService } from '../services/view-state.service';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 describe('ToolbarComponent', () => {
   let component: ToolbarComponent;
@@ -42,16 +36,7 @@ describe('ToolbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ToolbarComponent, RegexInputComponent],
-      imports: [
-        NoopAnimationsModule,
-        OverlayModule,
-        MatIconModule,
-        MatInputModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatButtonToggleModule,
-      ],
+      imports: [NoopAnimationsModule],
       providers: [
         WindowConnectorService,
         {

@@ -16,7 +16,6 @@
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MatDialogModule } from '@angular/material/dialog';
 import {
   WINDOW_CONNECTION_PROVIDER,
   WindowConnectorService,
@@ -24,8 +23,6 @@ import {
 import { InMemoryWindowConnectionProvider } from '../services/frame-connection/window-connection-provider.service';
 import { InspectionDataLoaderService } from '../services/data-loader.service';
 import { InspectionDataStoreService } from '../services/inspection-data-store.service';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { GraphMenuComponent } from './graph-menu.component';
 
 describe('GraphMenuComponent', () => {
@@ -34,8 +31,6 @@ describe('GraphMenuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [GraphMenuComponent],
-      imports: [MatDialogModule, MatIconModule, MatMenuModule],
       providers: [
         WindowConnectorService,
         {

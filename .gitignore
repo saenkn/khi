@@ -9,5 +9,3 @@ go-cover.output
 .envrc
 *.khi
 .terraform/
-
-oss

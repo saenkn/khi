@@ -15,9 +15,6 @@
  */
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { DiffViewComponent } from './diff-view.component';
 import {
@@ -25,7 +22,12 @@ import {
   WindowConnectorService,
 } from '../services/frame-connection/window-connector.service';
 import { InMemoryWindowConnectionProvider } from '../services/frame-connection/window-connection-provider.service';
-import { DiffModule } from './diff.module';
+import { TIMELINE_ANNOTATOR_RESOLVER } from '../annotator/timeline/resolver';
+import { getDefaultTimelineAnnotatorResolver } from '../annotator/timeline/default';
+import { CHANGE_PAIR_TOOL_ANNOTATOR_RESOLVER } from '../annotator/change-pair-tool/resolver';
+import { getDefaultChangePairToolAnnotatorResolver } from '../annotator/change-pair-tool/default';
+import { CHANGE_PAIR_ANNOTATOR_RESOLVER } from '../annotator/change-pair/resolver';
+import { getDefaultChangePairAnnotatorResolver } from '../annotator/change-pair/default';
 
 describe('DiffViewComponent', () => {
   let component: DiffViewComponent;
@@ -33,13 +35,23 @@ describe('DiffViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DiffViewComponent],
-      imports: [MatButtonModule, MatToolbarModule, MatIconModule, DiffModule],
       providers: [
         WindowConnectorService,
         {
           provide: WINDOW_CONNECTION_PROVIDER,
           useValue: new InMemoryWindowConnectionProvider(),
+        },
+        {
+          provide: TIMELINE_ANNOTATOR_RESOLVER,
+          useValue: getDefaultTimelineAnnotatorResolver(),
+        },
+        {
+          provide: CHANGE_PAIR_TOOL_ANNOTATOR_RESOLVER,
+          useValue: getDefaultChangePairToolAnnotatorResolver(),
+        },
+        {
+          provide: CHANGE_PAIR_ANNOTATOR_RESOLVER,
+          useValue: getDefaultChangePairAnnotatorResolver(),
         },
       ],
     }).compileComponents();

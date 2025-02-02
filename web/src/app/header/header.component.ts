@@ -15,10 +15,14 @@
  */
 
 import { Component } from '@angular/core';
+import { TitleBarComponent } from './titlebar.component';
+import { MainMenuComponent } from './main-menu.component';
+import { ToolbarComponent } from './toolbar.component';
 
 @Component({
   selector: 'khi-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.sass'],
+  imports: [TitleBarComponent, MainMenuComponent, ToolbarComponent],
 })
 export class HeaderComponent {}

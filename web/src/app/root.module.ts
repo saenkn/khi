@@ -24,35 +24,23 @@ import {
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AppComponent } from './pages/main/main.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHighlightOptions } from 'ngx-highlightjs';
 import { InspectionDataLoaderService } from './services/data-loader.service';
 import { TimelineSelectionService } from './services/timeline-selection.service';
 import { InspectionDataStoreService } from './services/inspection-data-store.service';
 import { SelectionManagerService } from './services/selection-manager.service';
-import { HeaderModule } from './header/header.module';
-import { DialogsModule } from './dialogs/dialogs.module';
-import { LogModule } from './log/log.module';
-import { DiffModule } from './diff/diff.module';
-import { CommonModule } from '@angular/common';
-import { TimelineModule } from './timeline/timeline.module';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterModule, TitleStrategy } from '@angular/router';
 import { KHIRoutes } from './app.route';
 import { RootComponent } from './root.component';
-import { GraphPageModule } from './pages/graph/graph.module';
 import {
   WINDOW_CONNECTION_PROVIDER,
   WindowConnectorService,
 } from './services/frame-connection/window-connector.service';
 import { BroadcastChannelWindowConnectionProvider } from './services/frame-connection/window-connection-provider.service';
 import { KHITitleStrategy } from './services/title-strategy.service';
-import { KHICommonModule } from './common/common.module';
-import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { MatIconRegistry } from '@angular/material/icon';
 import { HttpClientModule } from '@angular/common/http';
-import { RequestUserActionPopupComponent } from './dialogs/request-user-action-popup/request-user-action-popup.component';
 import { POPUP_MANAGER } from './services/popup/popup-manager';
 import { PopupManagerImpl } from './services/popup/popup-manager-impl';
 import { BACKEND_API } from './services/api/backend-api-interface';
@@ -84,25 +72,29 @@ import {
   MatTooltipDefaultOptions,
 } from '@angular/material/tooltip';
 import { ViewStateService } from './services/view-state.service';
+import { LOG_ANNOTATOR_RESOLVER } from './annotator/log/resolver';
+import { getDefaultLogAnnotatorResolver } from './annotator/log/default';
+import { LOG_TOOL_ANNOTATOR_RESOLVER } from './annotator/log-tool/resolver';
+import { getDefaultLogToolAnnotatorResolver } from './annotator/log-tool/default';
+import { TIMELINE_ANNOTATOR_RESOLVER } from './annotator/timeline/resolver';
+import { getDefaultTimelineAnnotatorResolver } from './annotator/timeline/default';
+import {
+  CHANGE_PAIR_TOOL_ANNOTATOR_FOR_FLOATING_PAGE_RESOLVER,
+  CHANGE_PAIR_TOOL_ANNOTATOR_RESOLVER,
+} from './annotator/change-pair-tool/resolver';
+import {
+  getDefaultChangePairToolAnnotatorResolver,
+  getDefaultChangePairToolAnnotatorResolverForFloatingPage,
+} from './annotator/change-pair-tool/default';
+import { CHANGE_PAIR_ANNOTATOR_RESOLVER } from './annotator/change-pair/resolver';
+import { getDefaultChangePairAnnotatorResolver } from './annotator/change-pair/default';
 @NgModule({
-  declarations: [AppComponent, RootComponent],
+  declarations: [RootComponent],
   imports: [
-    CommonModule,
-    KHICommonModule,
     BrowserModule,
     BrowserAnimationsModule,
-    HeaderModule,
-    DialogsModule,
-    LogModule,
-    DiffModule,
-    GraphPageModule,
-    TimelineModule,
-    MatSnackBarModule,
     RouterModule.forRoot(KHIRoutes),
-    MatIconModule,
-    MatButtonModule,
     // Standoalone components
-    RequestUserActionPopupComponent,
     environment.pluginModules,
   ],
   providers: [
@@ -125,6 +117,30 @@ import { ViewStateService } from './services/view-state.service';
     InspectionDataStoreService,
     SelectionManagerService,
     WindowConnectorService,
+    {
+      provide: LOG_ANNOTATOR_RESOLVER,
+      useValue: getDefaultLogAnnotatorResolver(),
+    },
+    {
+      provide: LOG_TOOL_ANNOTATOR_RESOLVER,
+      useValue: getDefaultLogToolAnnotatorResolver(),
+    },
+    {
+      provide: TIMELINE_ANNOTATOR_RESOLVER,
+      useValue: getDefaultTimelineAnnotatorResolver(),
+    },
+    {
+      provide: CHANGE_PAIR_TOOL_ANNOTATOR_RESOLVER,
+      useValue: getDefaultChangePairToolAnnotatorResolver(),
+    },
+    {
+      provide: CHANGE_PAIR_TOOL_ANNOTATOR_FOR_FLOATING_PAGE_RESOLVER,
+      useValue: getDefaultChangePairToolAnnotatorResolverForFloatingPage(),
+    },
+    {
+      provide: CHANGE_PAIR_ANNOTATOR_RESOLVER,
+      useValue: getDefaultChangePairAnnotatorResolver(),
+    },
     {
       provide: WINDOW_CONNECTION_PROVIDER,
       useValue: new BroadcastChannelWindowConnectionProvider(),

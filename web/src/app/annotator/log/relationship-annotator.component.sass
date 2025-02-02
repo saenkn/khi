@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@use "sass:color"
 @use '@angular/material' as mat
 
 $FONT_SIZE: 12px
-$LABEL_BACKGROUND: mat.get-color-from-palette(mat.$indigo-palette,600)
-$BACKGROUND: mat.get-color-from-palette(mat.$indigo-palette,100)
+$LABEL_BACKGROUND: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,600)
+$BACKGROUND: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,100)
 $LABEL_COLOR: white
 $VALUE_COLOR: black
 .label
@@ -54,7 +54,7 @@ $VALUE_COLOR: black
     text-overflow: ellipsis
     background-color: $BACKGROUND
     &:hover
-        background-color: darken($BACKGROUND, 5%)
+        background-color: color.adjust($BACKGROUND,$lightness: -5%)
         text-decoration: underline
         cursor: pointer
     .index
@@ -62,10 +62,10 @@ $VALUE_COLOR: black
         width: 15px
         height: 100%
         margin: 0.5px 3px 0.5px 0
-        background-color: darken($BACKGROUND,10%)
+        background-color: color.adjust($BACKGROUND,$lightness: -10%)
         color: white
         text-align: center
         padding: 0 3px
     &.current
         .index
-            background-color: mat.get-color-from-palette(mat.$indigo-palette,400)
+            background-color: mat.m2-get-color-from-palette(mat.$m2-indigo-palette,400)

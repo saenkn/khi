@@ -16,9 +16,7 @@
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LogViewLogLineComponent } from './log-view-log-line.component';
-import { KHICommonModule } from '../common/common.module';
 import { LogType, Severity } from '../generated';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { LogEntry } from '../store/log';
 import { ReferenceType } from '../common/loader/interface';
 
@@ -27,11 +25,7 @@ describe('LogViewLogLineComponent', () => {
   let fixture: ComponentFixture<LogViewLogLineComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [LogViewLogLineComponent],
-      imports: [KHICommonModule, MatTooltipModule],
-      providers: [],
-    }).compileComponents();
+    await TestBed.configureTestingModule({}).compileComponents();
     fixture = TestBed.createComponent(LogViewLogLineComponent);
     component = fixture.componentInstance;
     component.log = new LogEntry(

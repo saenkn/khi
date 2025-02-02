@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {
   PROGRESS_DIALOG_STATUS_OBSERVER,
   ProgressDialogStatusObserver,
@@ -23,6 +25,7 @@ import {
 @Component({
   templateUrl: './progress.component.html',
   styleUrls: ['./progress.component.sass'],
+  imports: [CommonModule, MatProgressBarModule],
 })
 export class ProgressDialogComponent {
   public currentStatus = this.progressObserver.status();

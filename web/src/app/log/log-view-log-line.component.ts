@@ -16,6 +16,9 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LogEntry } from '../store/log';
+import { CommonModule } from '@angular/common';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TimestampFormatPipe } from '../common/timestamp-format.pipe';
 
 /**
  * A line of log in log view list.
@@ -24,6 +27,7 @@ import { LogEntry } from '../store/log';
   selector: 'khi-log-view-log-line',
   templateUrl: './log-view-log-line.component.html',
   styleUrls: ['./log-view-log-line.component.sass'],
+  imports: [CommonModule, MatTooltipModule, TimestampFormatPipe],
 })
 export class LogViewLogLineComponent {
   /**

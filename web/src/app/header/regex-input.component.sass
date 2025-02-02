@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@use "sass:color"
 .container
     z-index: 10000
     :host::ng-deep
@@ -23,7 +23,7 @@
             border-radius: 10px
             padding: 10px
             font-size: small
-            color: lighten(red,30%)
+            color: color.adjust(red,$lightness: 30%)
 
         .mat-mdc-form-field-subscript-wrapper
             height: 0

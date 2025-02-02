@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* eslint  @angular-eslint/prefer-standalone: 0 */
 
 import { Component } from '@angular/core';
 
@@ -20,5 +21,6 @@ import { Component } from '@angular/core';
   selector: 'khi-root',
   templateUrl: './root.component.html',
   styleUrls: ['./root.component.sass'],
+  standalone: false,
 })
 export class RootComponent {}

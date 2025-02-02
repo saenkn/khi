@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
+import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
+import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'khi-meta-table-row',
   templateUrl: './meta-table-row.component.html',
   styleUrls: ['./meta-table-row.component.sass'],
+  imports: [CommonModule, MatIconModule, MatTooltipModule, CdkCopyToClipboard],
 })
 export class MetaTableRowComponent {
   @Input()

@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-import { OverlayModule } from '@angular/cdk/overlay';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormFieldHarness } from '@angular/material/form-field/testing';
 import { RegexInputComponent } from './regex-input.component';
@@ -33,15 +29,7 @@ describe('RegexFilterFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RegexInputComponent],
-      imports: [
-        NoopAnimationsModule,
-        MatInputModule,
-        OverlayModule,
-        MatFormFieldModule,
-        FormsModule,
-        ReactiveFormsModule,
-      ],
+      imports: [NoopAnimationsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RegexInputComponent);

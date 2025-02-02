@@ -35,11 +35,27 @@ import {
   DEFAULT_TIMELINE_FILTER,
   TimelineFilter,
 } from '../services/timeline-filter.service';
+import { SetInputComponent } from './set-input.component';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { RegexInputComponent } from './regex-input.component';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'khi-header-toolbar',
   templateUrl: './toolbar.component.html',
   styleUrls: ['./toolbar.component.sass'],
+  imports: [
+    CommonModule,
+    SetInputComponent,
+    MatIconModule,
+    OverlayModule,
+    RegexInputComponent,
+    MatButtonModule,
+    MatButtonToggleModule,
+  ],
 })
 export class ToolbarComponent implements OnInit, OnDestroy {
   private destoroyed = new Subject<void>();

@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@use "sass:color"
 .background
     pointer-events: all
     border-radius: 20px
     max-width: 95vw
     min-width: 1200px
-    @media(max-width: 1200px)
-        min-width: 1000px
     min-height: 700px
     overflow: hidden
     background-color: #F8F8F8
@@ -34,15 +32,16 @@
         border-radius: 4px
         background-color: #3f51b5
         box-shadow: 0 0 1px rgba(255,255,255,.5)
+    @media(max-width: 1200px)
+        min-width: 1000px
     .title
         border-radius: 20px 0px 0px 20px
-        @media (max-width: 1200px)
-            display: none
-            
         min-width: 200px
         background-color: #3f51b5
         display: grid
         grid-template-rows: 1fr auto 2fr
+        @media (max-width: 1200px)
+            display: none
         .title-header
             grid-row: 3
             color: white
@@ -120,7 +119,7 @@
                     background-color: #3f51b5
                     color: white
                     &:hover
-                        background-color: darken(#3f51b5,5%)
+                        background-color: color.adjust(#3f51b5,$lightness: -5%)
                         cursor: default
                     .icon-container
                         mat-icon
@@ -161,7 +160,7 @@
                     flex-direction: column
                 &:hover
                     cursor: pointer
-                    background-color: darken(white,3%)
+                    background-color: color.adjust(white,$lightness: -3%)
         .inspect-right
             min-width: 420px
             padding: 20px 20px

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { map, shareReplay } from 'rxjs';
 import { EXTENSION_STORE } from 'src/app/extensions/extension-common/extension-store';
 import { DisplayableTimelineNavigatorExtension } from 'src/app/extensions/extension-common/extension-types/timeline-navigator';
@@ -36,6 +38,7 @@ interface NavigatorLayer {
   templateUrl: './navigator.component.html',
   styleUrl: './navigator.component.sass',
   selector: 'khi-timeline-navigator',
+  imports: [CommonModule, MatIconModule],
 })
 export class NavigatorComponent {
   private readonly extensionStore = inject(EXTENSION_STORE);

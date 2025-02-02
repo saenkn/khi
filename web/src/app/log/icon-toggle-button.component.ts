@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'khi-icon-toggle-button',
   templateUrl: './icon-toggle-button.component.html',
   styleUrls: ['./icon-toggle-button.component.sass'],
+  imports: [CommonModule, MatTooltipModule, MatIconModule],
 })
 export class IconToggleButtonComponent {
   @Input()

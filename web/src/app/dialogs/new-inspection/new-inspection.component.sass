@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@use "sass:color"
 
 // Main layout
 $inspection-type-icon-size: 80px
@@ -56,7 +56,7 @@ mat-step
 
 mat-card.inspection-type
     &:hover
-        background-color: darken(white,5%)
+        background-color: color.adjust(white,$lightness: -5%)
         cursor: pointer
     margin-bottom: 10px
     mat-card-content
@@ -91,7 +91,7 @@ mat-card.inspection-type
         cursor: pointer
         border: 2.5px solid transparent
         &:hover
-            background-color: darken(white,5%)
+            background-color: color.adjust(white,$lightness: -5%)
         &.selected
             border: 2.5px solid $selected-color
             .selected-icon

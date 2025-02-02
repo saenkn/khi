@@ -27,7 +27,6 @@ import {
 import {
   MAT_DIALOG_DATA,
   MatDialog,
-  MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
@@ -49,7 +48,7 @@ describe('RequestUserActionPopup in dialog context', () => {
   let loader: HarnessLoader;
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TestingDialogWrapComponent, MatDialogModule],
+      imports: [TestingDialogWrapComponent],
     }).compileComponents();
     testingWrapper = TestBed.createComponent(TestingDialogWrapComponent);
     testingWrapper.detectChanges();
@@ -96,7 +95,7 @@ describe('RequestUserActionPopup', () => {
   });
   it('should have disbaled submit button at first', async () => {
     await TestBed.configureTestingModule({
-      imports: [RequestUserActionPopupComponent, MatDialogModule],
+      imports: [RequestUserActionPopupComponent],
       providers: [
         {
           provide: MAT_DIALOG_DATA,
@@ -125,7 +124,7 @@ describe('RequestUserActionPopup', () => {
 
   it('should update the disabled status of submit button by input', fakeAsync(async () => {
     await TestBed.configureTestingModule({
-      imports: [RequestUserActionPopupComponent, MatDialogModule],
+      imports: [RequestUserActionPopupComponent],
       providers: [
         {
           provide: MAT_DIALOG_DATA,
@@ -168,7 +167,7 @@ describe('RequestUserActionPopup', () => {
 
   it('should close dialog after submit', fakeAsync(async () => {
     await TestBed.configureTestingModule({
-      imports: [RequestUserActionPopupComponent, MatDialogModule],
+      imports: [RequestUserActionPopupComponent],
       providers: [
         {
           provide: MAT_DIALOG_DATA,
@@ -208,7 +207,7 @@ describe('RequestUserActionPopup', () => {
 
   it('should show the valdiation error', fakeAsync(async () => {
     await TestBed.configureTestingModule({
-      imports: [RequestUserActionPopupComponent, MatDialogModule],
+      imports: [RequestUserActionPopupComponent],
       providers: [
         {
           provide: MAT_DIALOG_DATA,
