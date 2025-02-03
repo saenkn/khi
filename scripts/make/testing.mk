@@ -3,7 +3,7 @@
 
 .PHONY=test-web
 test-web: prepare-frontend
-	cd web && ng test --watch=false
+	cd web && npx ng test --watch=false
 
 .PHONY=test-go
 test-go:

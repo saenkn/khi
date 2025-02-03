@@ -90,6 +90,7 @@ For more details, please try [Getting started](./docs/en/getting-started.md).
 - Go 1.23.*
 - Node.js environment 22.13.*
 - [`gcloud` CLI](https://cloud.google.com/sdk/docs/install)
+- [`jq` command](https://jqlang.org/)
 
 #### Initialization (one-time setup)
 1. Download or clone this repository   
