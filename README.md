@@ -112,22 +112,54 @@ For more details, please try [Getting started](./docs/en/getting-started.md).
 > KHI itself is not providing any authentication or authorization features and KHI is intended to be accessed from its local user.
 
 ### Authentication settings
+## Settings for managed environments
 
-#### Google Cloud
+### Google Cloud
 
-Your account must have the following permissions granted:
+#### Permissions
+
+The following permissions are required or recommended.
 
 **Required**
 
 * `logging.logEntries.list`
 
-**Optional**
+**Recommended**
 
-This permission is used to show a suggestion popup to fill the forms of log filter.
-It works without the permission, but the suggestive autocomplete won't appear. 
+* Permissions to list clusters for cluster type (eg. `container.clusters.list` for GKE)
 
-* Cluster list permission for the cluster type (e.g `container.clusters.list` for GKE)
+   This permission is used to show autofill candidates for the log filter. KHI's main functionality is not affected without this permission. 
 
+
+##### Setup 
+
+* Running KHI on environments with a service account attached, such as Google Cloud Compute Engine Instance: Apply the permissions above to the attached service account.
+* Running KHI locally or on Cloud Shell with a user account: Apply the permissions above to your user account. 
+> [!WARNING]
+> KHI does not respect [ADC](https://cloud.google.com/docs/authentication/provide-credentials-adc) – running KHI on a Compute Engine Instances will always use the attached service account regardless of ADC.
+> This specification is subject to change in the future. 
+
+
+#### Audit Logging
+
+**Required**
+
+* **Nothing required**. KHI fully works with the default audit logging configuration.
+
+**Recommended**
+
+* Kubernetes Engine API Data access audit logs for `DATA_WRITE`
+
+> [!TIP]
+> Enabling these will log every patch requests on Pod or Node `.status` field.
+> KHI will use this to display detailed container status.
+> KHI will still guess the last container status from the audited Pod deletion log even without these logs, however it requires the Pod to be deleted within the queried timeframe.
+
+##### Setup
+1. In the Google Cloud Console, [go to the Audit Logs](https://console.cloud.google.com/iam-admin/audit) page.
+1. In the Data Access audit logs configuration table, select  `Kubernetes Engine API` from the Service column.
+1. In the Log Types tab, select the `Data write` Data Access audit log type
+1. Click "SAVE".
 
 ## User Guide
 
