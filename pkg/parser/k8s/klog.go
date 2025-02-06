@@ -18,15 +18,32 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/GoogleCloudPlatform/khi/pkg/log/schema"
+	"github.com/GoogleCloudPlatform/khi/pkg/model/enum"
 )
 
-var KLogSeverityFieldAlias = "@severity"
+// severityStringNotation maps string notation of severity found in logs to the severity types used in KHI.
+var severityStringNotation = map[string]enum.Severity{
+	"INFO":    enum.SeverityInfo,
+	"info":    enum.SeverityInfo,
+	"WARN":    enum.SeverityWarning,
+	"warn":    enum.SeverityWarning,
+	"WARNING": enum.SeverityWarning,
+	"warning": enum.SeverityWarning,
+	"ERROR":   enum.SeverityError,
+	"error":   enum.SeverityError,
+	"ERR":     enum.SeverityError,
+	"err":     enum.SeverityError,
+	"FATAL":   enum.SeverityFatal,
+	"fatal":   enum.SeverityFatal,
+	"panic":   enum.SeverityFatal,
+}
+
+var severityKlogFieldNames = []string{"level", "severity"}
 
 // https://github.com/kubernetes/klog/blob/v2.80.1/klog.go#L626-L645
 // TODO: We need to handle time field in later, but ignore it for now because times can be obtained from the other source.
 type klogHeader struct {
-	Severity string
+	Severity enum.Severity
 	Message  string
 }
 
@@ -36,16 +53,17 @@ var klogHeaderMatcher = regexp.MustCompile(`^([IWEF])(\d{2})(\d{2}) (\d{2}):(\d{
 func parseKLogHeader(klog string) *klogHeader {
 	matches := klogHeaderMatcher.FindStringSubmatch(klog)
 	if len(matches) > 0 {
-		severity := matches[1]
-		switch severity {
+		severityStr := matches[1]
+		severity := enum.SeverityUnknown
+		switch severityStr {
 		case "I":
-			severity = schema.SeverityInfo
+			severity = enum.SeverityInfo
 		case "W":
-			severity = schema.SeverityWarn
+			severity = enum.SeverityWarning
 		case "E":
-			severity = schema.SeverityError
+			severity = enum.SeverityError
 		case "F":
-			severity = schema.SeverityFatal
+			severity = enum.SeverityFatal
 		}
 		return &klogHeader{
 			Severity: severity,
@@ -146,15 +164,7 @@ func ExtractKLogField(klogBody string, field string) (string, error) {
 		message = header.Message
 	}
 	fields := parseKLogMessageFragment(message)
-	if field == KLogSeverityFieldAlias {
-		if header != nil {
-			return header.Severity, nil
-		}
-		if severity, hasLevel := fields["level"]; hasLevel {
-			return strings.ToUpper(severity), nil
-		}
-		return schema.SeverityUnknown, nil
-	} else if field == "" {
+	if field == "" {
 		if message, hasMsg := fields["msg"]; hasMsg {
 			return message, nil
 		}
@@ -169,4 +179,24 @@ func ExtractKLogField(klogBody string, field string) (string, error) {
 			return "", nil
 		}
 	}
+}
+
+// ExractKLogSeverity returns severity from klog formatted logs.
+func ExractKLogSeverity(klogBody string) enum.Severity {
+	header := parseKLogHeader(klogBody)
+	if header != nil {
+		klogBody = header.Message
+	}
+	fields := parseKLogMessageFragment(klogBody)
+	for _, fieldName := range severityKlogFieldNames {
+		if severityInStr, hasLevel := fields[fieldName]; hasLevel {
+			if khiSeverity, isKnownSeverity := severityStringNotation[severityInStr]; isKnownSeverity {
+				return khiSeverity
+			}
+		}
+	}
+	if header != nil {
+		return header.Severity
+	}
+	return enum.SeverityUnknown
 }
