@@ -1,0 +1,20 @@
+{
+    "name": "khi",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "dev-env",
+    "workspaceFolder": "/workspace",
+
+    "initializeCommand": {
+        "check-prerequisites": "bash .devcontainer/setup-check.sh"
+    },
+
+    "postStartCommand": {
+        "setup-dev": "bash .devcontainer/setup-dev.sh"
+    },
+
+    "remoteUser": "${localEnv:USERNAME}",
+
+    "updateRemoteUserUID": true,
+
+    "overrideCommand": false
+}
