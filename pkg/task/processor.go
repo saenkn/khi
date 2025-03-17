@@ -30,13 +30,7 @@ func NewProcessorTask(taskImplementationIdInString string, dependenciesInString 
 	for _, dependency := range dependenciesInString {
 		taskDependencyReferenceIds = append(taskDependencyReferenceIds, taskid.NewTaskReference(dependency))
 	}
-	return NewDefinitionFromFunc(taskImplementationId, taskDependencyReferenceIds, func(taskMode int) Runnable {
-		return NewRunnableFunc(func(ctx context.Context, v *VariableSet) error {
-			result, err := processor(ctx, taskMode, v)
-			if err != nil {
-				return err
-			}
-			return v.Set(taskImplementationId.ReferenceId().String(), result)
-		})
+	return NewDefinitionFromFunc(taskImplementationId, taskDependencyReferenceIds, func(ctx context.Context, taskMode int, v *VariableSet) (any, error) {
+		return processor(ctx, taskMode, v)
 	}, labelOpts...)
 }

@@ -84,39 +84,16 @@ func (r *LocalRunner) Run(ctx context.Context, taskMode int, initialVariables ma
 		definitions := r.resolvedDefinitionSet.GetAll()
 		cancelableCtx, cancel := context.WithCancel(ctx)
 		currentErrGrp, currentErrCtx := errgroup.WithContext(cancelableCtx)
-		currentTasks := []taskid.TaskImplementationId{}
-		for i, definition := range definitions {
+		for i := range definitions {
 			taskDefIndex := i
-			// if this task was thread-unsafe, wait all tasks started before.
-			if isThreadUnsafe := definition.Labels().GetOrDefault(LabelKeyThreadUnsafe, false); isThreadUnsafe.(bool) {
-				err := currentErrGrp.Wait()
-				if err != nil {
-					slog.WarnContext(currentErrCtx, fmt.Sprintf("tasks return errors during waiting for starting task %s", definitions[taskDefIndex].ID()))
-					cancel()
-					r.resultError = err
-					return
-				}
-				nextTaskId := definitions[taskDefIndex].ID()
-				currentTasks = []taskid.TaskImplementationId{nextTaskId}
-				err = r.runTask(cancelableCtx, taskDefIndex, taskMode)
+			currentErrGrp.Go(func() error {
+				err := r.runTask(currentErrCtx, taskDefIndex, taskMode)
 				if err != nil {
 					cancel()
-					r.resultError = err
-					return
+					return err
 				}
-				currentErrGrp, currentErrCtx = errgroup.WithContext(cancelableCtx)
-			} else {
-				nextTaskId := definitions[taskDefIndex].ID()
-				currentTasks = append(currentTasks, nextTaskId)
-				currentErrGrp.Go(func() error {
-					err := r.runTask(currentErrCtx, taskDefIndex, taskMode)
-					if err != nil {
-						cancel()
-						return err
-					}
-					return nil
-				})
-			}
+				return nil
+			})
 		}
 		err := currentErrGrp.Wait()
 		if err != nil {
@@ -130,7 +107,6 @@ func (r *LocalRunner) Run(ctx context.Context, taskMode int, initialVariables ma
 func (r *LocalRunner) runTask(ctx context.Context, taskDefIndex int, taskMode int) error {
 	definition := r.resolvedDefinitionSet.GetAll()[taskDefIndex]
 	sources := definition.Dependencies()
-	runnable := definition.Runnable(taskMode)
 	taskStatus := r.taskStatuses[taskDefIndex]
 	ctx = context.WithValue(ctx, "tid", definition.ID())
 	slog.DebugContext(ctx, fmt.Sprintf("task %s started", definition.ID().String()))
@@ -143,7 +119,7 @@ func (r *LocalRunner) runTask(ctx context.Context, taskDefIndex int, taskMode in
 	taskStatus.Phase = LocalRunnerTaskStatPhaseRunning
 	slog.DebugContext(ctx, fmt.Sprintf("task %s started", definition.ID()))
 
-	err := runnable.Run(ctx, r.resultVariable)
+	result, err := definition.Run(ctx, taskMode, r.resultVariable)
 
 	taskStatus.Phase = LocalRunnerTaskStatPhaseStopped
 	taskStatus.EndTime = time.Now()
@@ -158,6 +134,7 @@ func (r *LocalRunner) runTask(ctx context.Context, taskDefIndex int, taskMode in
 		slog.ErrorContext(ctx, err.Error())
 		return detailedErr
 	}
+	r.resultVariable.Set(definition.ID().ReferenceId().String(), result)
 	err = r.resolveTask(ctx, definition.ID())
 	if err != nil {
 		detailedErr := r.wrapWithTaskError(err, definition)
@@ -233,5 +210,5 @@ func (r *LocalRunner) waitDependencies(ctx context.Context, sources []taskid.Tas
 
 func (r *LocalRunner) wrapWithTaskError(err error, definition Definition) error {
 	errMsg := fmt.Sprintf("failed to run a task graph.\n definition ID=%s got an error. \n ERROR:\n%v", definition.ID(), err)
-	return fmt.Errorf(errMsg)
+	return fmt.Errorf("%s", errMsg)
 }
