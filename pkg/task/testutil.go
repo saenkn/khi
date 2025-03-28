@@ -14,32 +14,9 @@
 
 package task
 
-func newLocalCachedTaskRunnerForSingleTask(target Definition, cache TaskVariableCache, dependencies ...Definition) (*LocalRunner, error) {
-	sourceDs, err := NewSet([]Definition{target})
-	if err != nil {
-		return nil, err
-	}
-	availableDs, err := NewSet(dependencies)
-	if err != nil {
-		return nil, err
-	}
-
-	resolved, err := sourceDs.ResolveTask(availableDs)
-	if err != nil {
-		return nil, err
-	}
-
-	localRunner, err := NewLocalRunner(resolved)
-	if err != nil {
-		return nil, err
-	}
-	localRunner.WithCacheProvider(cache)
-	return localRunner, nil
-}
-
 // HasDependency check if 2 tasks have dependency between them when the task graph was resolved with given task set.
-func HasDependency(taskSet *DefinitionSet, dependencyFrom Definition, dependencyTo Definition) (bool, error) {
-	sourceSet, err := NewSet([]Definition{dependencyFrom})
+func HasDependency(taskSet *DefinitionSet, dependencyFrom UntypedDefinition, dependencyTo UntypedDefinition) (bool, error) {
+	sourceSet, err := NewSet([]UntypedDefinition{dependencyFrom})
 	if err != nil {
 		return false, err
 	}
@@ -49,7 +26,7 @@ func HasDependency(taskSet *DefinitionSet, dependencyFrom Definition, dependency
 	}
 	dependentDefinitions := resolvedSet.GetAll()
 	for _, definition := range dependentDefinitions {
-		if definition.ID() == dependencyTo.ID() {
+		if definition.UntypedID().String() == dependencyTo.UntypedID().String() {
 			return true, nil
 		}
 	}

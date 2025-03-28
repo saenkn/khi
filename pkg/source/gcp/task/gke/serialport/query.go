@@ -19,22 +19,23 @@ import (
 	"fmt"
 	"strings"
 
+	inspection_task_interface "github.com/GoogleCloudPlatform/khi/pkg/inspection/interface"
 	inspection_task "github.com/GoogleCloudPlatform/khi/pkg/inspection/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 
 	"github.com/GoogleCloudPlatform/khi/pkg/model/enum"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query/queryutil"
 	gcp_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_audit/k8saudittask"
-	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	serialport_taskid "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/serialport/taskid"
 )
-
-const SerialPortLogQueryTaskID = query.GKEQueryPrefix + "serialport"
 
 const MaxNodesPerQuery = 30
 
-func GenerateSerialPortQuery(taskMode int, foundNodeNames []string, nodeNameSubstrings []string) []string {
-	if taskMode == inspection_task.TaskModeDryRun {
+func GenerateSerialPortQuery(taskMode inspection_task_interface.InspectionTaskMode, foundNodeNames []string, nodeNameSubstrings []string) []string {
+	if taskMode == inspection_task_interface.TaskModeDryRun {
 		return []string{
 			generateSerialPortQueryWithInstanceNameFilter("-- instance name filters to be determined after audit log query", generateNodeNameSubstringLogFilter(nodeNameSubstrings)),
 		}
@@ -68,20 +69,15 @@ LOG_ID("serialconsole.googleapis.com%%2Fserial_port_debug_output")
 %s`, instanceNameFilter, nodeNameSubstringFilter)
 }
 
-var GKESerialPortLogQueryTask = query.NewQueryGeneratorTask(SerialPortLogQueryTaskID, "Serial port log", enum.LogTypeSerialPort, []string{
+var GKESerialPortLogQueryTask = query.NewQueryGeneratorTask(serialport_taskid.SerialPortLogQueryTaskID, "Serial port log", enum.LogTypeSerialPort, []taskid.UntypedTaskReference{
 	k8saudittask.K8sAuditParseTaskID,
 	gcp_task.InputNodeNameFilterTaskID,
-}, func(ctx context.Context, taskMode int, vs *task.VariableSet) ([]string, error) {
-	builder, err := inspection_task.GetHistoryBuilderFromTaskVariable(vs)
-	if err != nil {
-		return nil, err
-	}
-	nodeNameSubstrings, err := gcp_task.GetNodeNameFilterFromTaskVaraible(vs)
-	if err != nil {
-		return nil, err
-	}
+}, func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode) ([]string, error) {
+	builder := task.GetTaskResult(ctx, inspection_task.BuilderGeneratorTaskID.GetTaskReference())
+	nodeNameSubstrings := task.GetTaskResult(ctx, gcp_task.InputNodeNameFilterTaskID.GetTaskReference())
+
 	return GenerateSerialPortQuery(taskMode, builder.ClusterResource.GetNodes(), nodeNameSubstrings), nil
-}, GenerateSerialPortQuery(inspection_task.TaskModeRun, []string{
+}, GenerateSerialPortQuery(inspection_task_interface.TaskModeRun, []string{
 	"gke-test-cluster-node-1",
 	"gke-test-cluster-node-2",
 }, []string{})[0])

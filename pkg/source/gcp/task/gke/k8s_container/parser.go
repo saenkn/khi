@@ -25,8 +25,8 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/model/history/grouper"
 	"github.com/GoogleCloudPlatform/khi/pkg/model/history/resourcepath"
 	"github.com/GoogleCloudPlatform/khi/pkg/parser"
-	gcp_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task"
-	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	gke_k8s_container_taskid "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_container/taskid"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
 type k8sContainerParser struct {
@@ -47,12 +47,12 @@ func (*k8sContainerParser) GetParserName() string {
 	return "Kubernetes container logs"
 }
 
-func (*k8sContainerParser) Dependencies() []string {
-	return []string{}
+func (*k8sContainerParser) Dependencies() []taskid.UntypedTaskReference {
+	return []taskid.UntypedTaskReference{}
 }
 
-func (*k8sContainerParser) LogTask() string {
-	return GKEContainerLogQueryTaskID
+func (*k8sContainerParser) LogTask() taskid.TaskReference[[]*log.LogEntity] {
+	return gke_k8s_container_taskid.GKEContainerLogQueryTaskID.GetTaskReference()
 }
 
 func (*k8sContainerParser) Grouper() grouper.LogGrouper {
@@ -60,7 +60,7 @@ func (*k8sContainerParser) Grouper() grouper.LogGrouper {
 }
 
 // Parse implements parser.Parser.
-func (*k8sContainerParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder, v *task.VariableSet) error {
+func (*k8sContainerParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder) error {
 	namespace := l.GetStringOrDefault("resource.labels.namespace_name", "unknown")
 	podName := l.GetStringOrDefault("resource.labels.pod_name", "unknown")
 	containerName := l.GetStringOrDefault("resource.labels.container_name", "unknown")
@@ -94,4 +94,4 @@ func (*k8sContainerParser) Parse(ctx context.Context, l *log.LogEntity, cs *hist
 
 var _ parser.Parser = (*k8sContainerParser)(nil)
 
-var GKEContainerLogParseJob = parser.NewParserTaskFromParser(gcp_task.GCPPrefix+"feature/container-parser", &k8sContainerParser{}, false)
+var GKEContainerLogParseJob = parser.NewParserTaskFromParser(gke_k8s_container_taskid.GKEContainerParserTaskID, &k8sContainerParser{}, false)

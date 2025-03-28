@@ -19,11 +19,14 @@ import (
 	"fmt"
 	"strings"
 
+	inspection_task_interface "github.com/GoogleCloudPlatform/khi/pkg/inspection/interface"
 	"github.com/GoogleCloudPlatform/khi/pkg/model/enum"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query/queryutil"
 	gcp_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task"
+	k8s_node_taskid "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_node/taskid"
 	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
 func GenerateK8sNodeLogQuery(projectId string, clusterId string, nodeNameSubstrings []string) string {
@@ -42,24 +45,14 @@ func generateNodeNameSubstringLogFilter(nodeNameSubstrings []string) string {
 	}
 }
 
-const GKENodeLogQueryTaskID = query.GKEQueryPrefix + "k8s-node"
-
-var GKENodeQueryTask = query.NewQueryGeneratorTask(GKENodeLogQueryTaskID, "Kubernetes node log", enum.LogTypeNode, []string{
+var GKENodeQueryTask = query.NewQueryGeneratorTask(k8s_node_taskid.GKENodeLogQueryTaskID, "Kubernetes node log", enum.LogTypeNode, []taskid.UntypedTaskReference{
 	gcp_task.InputProjectIdTaskID,
 	gcp_task.InputClusterNameTaskID,
 	gcp_task.InputNodeNameFilterTaskID,
-}, func(ctx context.Context, i int, vs *task.VariableSet) ([]string, error) {
-	clusterName, err := gcp_task.GetInputClusterNameFromTaskVariable(vs)
-	if err != nil {
-		return nil, err
-	}
-	projectId, err := gcp_task.GetInputProjectIdFromTaskVariable(vs)
-	if err != nil {
-		return nil, err
-	}
-	nodeNameSubstrings, err := gcp_task.GetNodeNameFilterFromTaskVaraible(vs)
-	if err != nil {
-		return nil, err
-	}
-	return []string{GenerateK8sNodeLogQuery(projectId, clusterName, nodeNameSubstrings)}, nil
+}, func(ctx context.Context, i inspection_task_interface.InspectionTaskMode) ([]string, error) {
+	clusterName := task.GetTaskResult(ctx, gcp_task.InputClusterNameTaskID.GetTaskReference())
+	projectID := task.GetTaskResult(ctx, gcp_task.InputProjectIdTaskID.GetTaskReference())
+	nodeNameSubstrings := task.GetTaskResult(ctx, gcp_task.InputNodeNameFilterTaskID.GetTaskReference())
+
+	return []string{GenerateK8sNodeLogQuery(projectID, clusterName, nodeNameSubstrings)}, nil
 }, GenerateK8sNodeLogQuery("gcp-project-id", "gcp-cluster-name", []string{"gke-test-cluster-node-1", "gke-test-cluster-node-2"}))

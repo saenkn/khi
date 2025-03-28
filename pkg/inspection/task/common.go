@@ -18,41 +18,29 @@ import (
 	"context"
 	"time"
 
-	"github.com/GoogleCloudPlatform/khi/pkg/common/typedmap"
 	common_task "github.com/GoogleCloudPlatform/khi/pkg/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
 type InspectionRequest struct {
 	Values map[string]any
 }
 
-var InspectionTimeTaskID = InspectionTaskPrefix + "task/time"
+var InspectionTimeTaskID = taskid.NewDefaultImplementationID[time.Time](InspectionTaskPrefix + "task/time")
 
 // InspectionTimeProducer is a provider of inspection time.
 // Tasks shouldn't use time.Now() directly to make test easier.
-var InspectionTimeProducer common_task.Definition = common_task.NewProcessorTask(InspectionTimeTaskID, []string{}, func(ctx context.Context, taskMode int, v *common_task.VariableSet) (any, error) {
+var InspectionTimeProducer common_task.Definition[time.Time] = common_task.NewTask(InspectionTimeTaskID, []taskid.UntypedTaskReference{}, func(ctx context.Context) (time.Time, error) {
 	return time.Now(), nil
 })
 
 // TestInspectionTimeTaskProducer is a function to generate a fake InspectionTimeProducer task with the given time string.
-var TestInspectionTimeTaskProducer func(timeStr string) common_task.Definition = func(timeStr string) common_task.Definition {
-	return common_task.NewProcessorTask(InspectionTimeTaskID, []string{}, func(ctx context.Context, taskMode int, v *common_task.VariableSet) (any, error) {
-		time, err := time.Parse(time.RFC3339, timeStr)
+var TestInspectionTimeTaskProducer func(timeStr string) common_task.Definition[time.Time] = func(timeStr string) common_task.Definition[time.Time] {
+	return common_task.NewTask(InspectionTimeTaskID, []taskid.UntypedTaskReference{}, func(ctx context.Context) (time.Time, error) {
+		t, err := time.Parse(time.RFC3339, timeStr)
 		if err != nil {
-			return nil, err
+			return time.Time{}, err
 		}
-		return time, nil
+		return t, nil
 	})
-}
-
-func GetMetadataSetFromVariable(v *common_task.VariableSet) (*typedmap.ReadonlyTypedMap, error) {
-	return common_task.GetTypedVariableFromTaskVariable[*typedmap.ReadonlyTypedMap](v, MetadataVariableName, nil)
-}
-
-func GetInspectionRequestFromVariable(v *common_task.VariableSet) (*InspectionRequest, error) {
-	return common_task.GetTypedVariableFromTaskVariable[*InspectionRequest](v, InspectionRequestVariableName, nil)
-}
-
-func GetInspectionTimeFromTaskVariable(v *common_task.VariableSet) (time.Time, error) {
-	return common_task.GetTypedVariableFromTaskVariable[time.Time](v, InspectionTimeTaskID, time.Time{})
 }

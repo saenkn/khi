@@ -22,6 +22,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	inspection_task_interface "github.com/GoogleCloudPlatform/khi/pkg/inspection/interface"
 	"github.com/GoogleCloudPlatform/khi/pkg/inspection/metadata/progress"
 	inspection_task "github.com/GoogleCloudPlatform/khi/pkg/inspection/task"
 	"github.com/GoogleCloudPlatform/khi/pkg/log"
@@ -30,6 +31,7 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_audit/rtype"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_audit/types"
 	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
 // ParseResourceSpecificParserInputWithoutResourceBody returns ResourceSpecificParserInput from a single LogEntity.
@@ -90,23 +92,21 @@ func ParseResourceSpecificParserInputWithoutResourceBody(ctx context.Context, l 
 	}, nil
 }
 
-var Task = inspection_task.NewInspectionProcessor(k8saudittask.CommonLogParseTaskID, []string{
+var Task = inspection_task.NewInspectionTask(k8saudittask.CommonLogParseTaskID, []taskid.UntypedTaskReference{
 	k8saudittask.K8sAuditQueryTaskID,
-}, func(ctx context.Context, taskMode int, v *task.VariableSet, tp *progress.TaskProgress) (any, error) {
-	if taskMode == inspection_task.TaskModeDryRun {
-		return struct{}{}, nil
+}, func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, tp *progress.TaskProgress) ([]*types.ResourceSpecificParserInput, error) {
+	if taskMode == inspection_task_interface.TaskModeDryRun {
+		return nil, nil
 	}
-	logs, err := task.GetTypedVariableFromTaskVariable[[]*log.LogEntity](v, k8saudittask.K8sAuditQueryTaskID, nil)
-	if err != nil {
-		return nil, err
-	}
+	logs := task.GetTaskResult(ctx, k8saudittask.K8sAuditQueryTaskID.GetTaskReference())
+
 	processedCount := atomic.Int32{}
 	progressUpdater := progress.NewProgressUpdator(tp, time.Second, func(tp *progress.TaskProgress) {
 		current := processedCount.Load()
 		tp.Percentage = float32(current) / float32(len(logs))
 		tp.Message = fmt.Sprintf("%d/%d", current, len(logs))
 	})
-	err = progressUpdater.Start(ctx)
+	err := progressUpdater.Start(ctx)
 	if err != nil {
 		return nil, err
 	}

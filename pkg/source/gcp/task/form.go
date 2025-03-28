@@ -23,8 +23,11 @@ import (
 	"time"
 
 	"github.com/GoogleCloudPlatform/khi/pkg/common"
+	"github.com/GoogleCloudPlatform/khi/pkg/common/khictx"
 	"github.com/GoogleCloudPlatform/khi/pkg/common/typedmap"
+	inspection_task_contextkey "github.com/GoogleCloudPlatform/khi/pkg/inspection/contextkey"
 	"github.com/GoogleCloudPlatform/khi/pkg/inspection/form"
+	inspection_task_interface "github.com/GoogleCloudPlatform/khi/pkg/inspection/interface"
 	form_metadata "github.com/GoogleCloudPlatform/khi/pkg/inspection/metadata/form"
 	"github.com/GoogleCloudPlatform/khi/pkg/inspection/metadata/header"
 	"github.com/GoogleCloudPlatform/khi/pkg/inspection/metadata/progress"
@@ -32,6 +35,7 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/parameters"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query/queryutil"
 	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
 const FormBasePriority = 100000
@@ -39,27 +43,26 @@ const PriorityForQueryTimeGroup = FormBasePriority + 50000
 const PriorityForResourceIdentifierGroup = FormBasePriority + 40000
 const PriorityForK8sResourceFilterGroup = FormBasePriority + 30000
 
-const InputProjectIdTaskID = GCPPrefix + "input/project-id"
+var InputProjectIdTaskID = taskid.NewDefaultImplementationID[string](GCPPrefix + "input/project-id")
 
 var projectIdValidator = regexp.MustCompile(`^\s*[0-9a-z\.:\-]+\s*$`)
 
 var InputProjectIdTask = form.NewInputFormDefinitionBuilder(InputProjectIdTaskID, PriorityForResourceIdentifierGroup+5000, "Project ID").
 	WithUIDescription("The project ID containing logs of the cluster to query").
 	WithDocumentDescription("The project ID containing logs of the cluster to query").
-	WithDependencies([]string{}).
-	WithValidator(func(ctx context.Context, value string, variables *task.VariableSet) (string, error) {
+	WithValidator(func(ctx context.Context, value string) (string, error) {
 		if !projectIdValidator.Match([]byte(value)) {
 			return "Project ID must match `^*[0-9a-z\\.:\\-]+$`", nil
 		}
 		return "", nil
 	}).
-	WithAllowEditFunc(func(ctx context.Context, variables *task.VariableSet) (bool, error) {
+	WithAllowEditFunc(func(ctx context.Context) (bool, error) {
 		if parameters.Auth.FixedProjectID == nil {
 			return true, nil
 		}
 		return *parameters.Auth.FixedProjectID == "", nil
 	}).
-	WithDefaultValueFunc(func(ctx context.Context, variables *task.VariableSet, previousValues []string) (string, error) {
+	WithDefaultValueFunc(func(ctx context.Context, previousValues []string) (string, error) {
 		if parameters.Auth.FixedProjectID != nil && *parameters.Auth.FixedProjectID != "" {
 			return *parameters.Auth.FixedProjectID, nil
 		}
@@ -68,27 +71,20 @@ var InputProjectIdTask = form.NewInputFormDefinitionBuilder(InputProjectIdTaskID
 		}
 		return "", nil
 	}).
-	WithConverter(func(ctx context.Context, value string, variables *task.VariableSet) (any, error) {
+	WithConverter(func(ctx context.Context, value string) (string, error) {
 		return strings.TrimSpace(value), nil
 	}).
 	Build()
 
-func GetInputProjectIdFromTaskVariable(tv *task.VariableSet) (string, error) {
-	return task.GetTypedVariableFromTaskVariable[string](tv, InputProjectIdTaskID, "<INVALID>")
-}
-
-const InputClusterNameTaskID = GCPPrefix + "input/cluster-name"
+var InputClusterNameTaskID = taskid.NewDefaultImplementationID[string](GCPPrefix + "input/cluster-name")
 
 var clusterNameValidator = regexp.MustCompile(`^\s*[0-9a-z\-]+\s*$`)
 
 var InputClusterNameTask = form.NewInputFormDefinitionBuilder(InputClusterNameTaskID, PriorityForResourceIdentifierGroup+4000, "Cluster name").
-	WithDependencies([]string{AutocompleteClusterNamesTaskID, ClusterNamePrefixTaskID}).
+	WithDependencies([]taskid.UntypedTaskReference{AutocompleteClusterNamesTaskID, ClusterNamePrefixTaskID}).
 	WithDocumentDescription("The cluster name to gather logs.").
-	WithDefaultValueFunc(func(ctx context.Context, variables *task.VariableSet, previousValues []string) (string, error) {
-		clusters, err := GetAutocompleteClusterNamesFromTaskVariable(variables)
-		if err != nil {
-			return "", err
-		}
+	WithDefaultValueFunc(func(ctx context.Context, previousValues []string) (string, error) {
+		clusters := task.GetTaskResult(ctx, AutocompleteClusterNamesTaskID)
 		// If the previous value is included in the list of cluster names, the name is used as the default value.
 		if len(previousValues) > 0 && slices.Index(clusters.ClusterNames, previousValues[0]) > -1 {
 			return previousValues[0], nil
@@ -98,25 +94,17 @@ var InputClusterNameTask = form.NewInputFormDefinitionBuilder(InputClusterNameTa
 		}
 		return clusters.ClusterNames[0], nil
 	}).
-	WithSuggestionsFunc(func(ctx context.Context, value string, variables *task.VariableSet, previousValues []string) ([]string, error) {
-		clusters, err := GetAutocompleteClusterNamesFromTaskVariable(variables)
-		if err != nil {
-			return []string{}, err
-		}
+	WithSuggestionsFunc(func(ctx context.Context, value string, previousValues []string) ([]string, error) {
+		clusters := task.GetTaskResult(ctx, AutocompleteClusterNamesTaskID)
 		return common.SortForAutocomplete(value, clusters.ClusterNames), nil
 	}).
-	WithHintFunc(func(ctx context.Context, value string, convertedValue any, variables *task.VariableSet) (string, form_metadata.FormFieldHintType, error) {
-		clusters, err := GetAutocompleteClusterNamesFromTaskVariable(variables)
-		if err != nil {
-			return "", form_metadata.HintTypeInfo, err
-		}
+	WithHintFunc(func(ctx context.Context, value string, convertedValue any) (string, form_metadata.FormFieldHintType, error) {
+		clusters := task.GetTaskResult(ctx, AutocompleteClusterNamesTaskID)
+		prefix := task.GetTaskResult(ctx, ClusterNamePrefixTaskID)
+
 		// on failure of getting the list of clusters
 		if clusters.Error != "" {
 			return fmt.Sprintf("Failed to obtain the cluster list due to the error '%s'.\n The suggestion list won't popup", clusters.Error), form_metadata.HintTypeWarning, nil
-		}
-		prefix, err := GetClusterNamePrefixFromTaskVariable(variables)
-		if err != nil {
-			return "", form_metadata.HintTypeInfo, err
 		}
 		convertedWithoutPrefix := strings.TrimPrefix(convertedValue.(string), prefix)
 		for _, suggestedCluster := range clusters.ClusterNames {
@@ -126,55 +114,40 @@ var InputClusterNameTask = form.NewInputFormDefinitionBuilder(InputClusterNameTa
 		}
 		return fmt.Sprintf("Cluster `%s` was not found in the specified project at this time. It works for the clusters existed in the past but make sure the cluster name is right if you believe the cluster should be there.", value), form_metadata.HintTypeWarning, nil
 	}).
-	WithValidator(func(ctx context.Context, value string, variables *task.VariableSet) (string, error) {
+	WithValidator(func(ctx context.Context, value string) (string, error) {
 		if !clusterNameValidator.Match([]byte(value)) {
 			return "Cluster name must match `^[0-9a-z:\\-]+$`", nil
 		}
 		return "", nil
 	}).
-	WithConverter(func(ctx context.Context, value string, variables *task.VariableSet) (any, error) {
-		// Needs to add the cluster name prefix defined by the inspection type.
-		prefix, err := GetClusterNamePrefixFromTaskVariable(variables)
-		if err != nil {
-			return nil, err
-		}
+	WithConverter(func(ctx context.Context, value string) (string, error) {
+		prefix := task.GetTaskResult(ctx, ClusterNamePrefixTaskID)
+
 		return prefix + strings.TrimSpace(value), nil
 	}).
 	Build()
 
-func GetInputClusterNameFromTaskVariable(tv *task.VariableSet) (string, error) {
-	return task.GetTypedVariableFromTaskVariable[string](tv, InputClusterNameTaskID, "<INVALID>")
-}
-
-const InputDurationTaskID = GCPPrefix + "input/duration"
+var InputDurationTaskID = taskid.NewDefaultImplementationID[time.Duration](GCPPrefix + "input/duration")
 
 var InputDurationTask = form.NewInputFormDefinitionBuilder(InputDurationTaskID, PriorityForQueryTimeGroup+4000, "Duration").
-	WithDependencies([]string{
+	WithDependencies([]taskid.UntypedTaskReference{
 		common_task.InspectionTimeTaskID,
 		InputEndTimeTaskID,
 		TimeZoneShiftInputTaskID,
 	}).
 	WithDocumentDescription("The duration of time range to gather logs. Supported time units are `h`,`m` or `s`. (Example: `3h30m`)").
-	WithDefaultValueFunc(func(ctx context.Context, variables *task.VariableSet, previousValues []string) (string, error) {
+	WithDefaultValueFunc(func(ctx context.Context, previousValues []string) (string, error) {
 		if len(previousValues) > 0 {
 			return previousValues[0], nil
 		} else {
 			return "1h", nil
 		}
 	}).
-	WithHintFunc(func(ctx context.Context, value string, convertedValue any, variables *task.VariableSet) (string, form_metadata.FormFieldHintType, error) {
-		inspectionTime, err := common_task.GetInspectionTimeFromTaskVariable(variables)
-		if err != nil {
-			return "", form_metadata.HintTypeInfo, err
-		}
-		endTime, err := GetInputEndTimeFromTaskVariable(variables)
-		if err != nil {
-			return "", form_metadata.HintTypeInfo, err
-		}
-		timezoneShift, err := GetTimezoneShiftInput(variables)
-		if err != nil {
-			return "", form_metadata.HintTypeInfo, err
-		}
+	WithHintFunc(func(ctx context.Context, value string, convertedValue any) (string, form_metadata.FormFieldHintType, error) {
+		inspectionTime := task.GetTaskResult(ctx, common_task.InspectionTimeTaskID.GetTaskReference())
+		endTime := task.GetTaskResult(ctx, InputEndTimeTaskID.GetTaskReference())
+		timezoneShift := task.GetTaskResult(ctx, TimeZoneShiftInputTaskID.GetTaskReference())
+
 		duration := convertedValue.(time.Duration)
 		startTime := endTime.Add(-duration)
 		startToNow := inspectionTime.Sub(startTime)
@@ -191,7 +164,7 @@ var InputDurationTask = form.NewInputFormDefinitionBuilder(InputDurationTaskID, 
 		return hintString, form_metadata.HintTypeInfo, nil
 	}).
 	WithSuggestionsConstant([]string{"1m", "10m", "1h", "3h", "12h", "24h"}).
-	WithValidator(func(ctx context.Context, value string, variables *task.VariableSet) (string, error) {
+	WithValidator(func(ctx context.Context, value string) (string, error) {
 		d, err := time.ParseDuration(value)
 		if err != nil {
 			return err.Error(), nil
@@ -201,97 +174,73 @@ var InputDurationTask = form.NewInputFormDefinitionBuilder(InputDurationTaskID, 
 		}
 		return "", nil
 	}).
-	WithConverter(func(ctx context.Context, value string, variables *task.VariableSet) (any, error) {
+	WithConverter(func(ctx context.Context, value string) (time.Duration, error) {
 		d, err := time.ParseDuration(value)
 		if err != nil {
-			return nil, err
+			return 0, err
 		}
 		return d, nil
 	}).
 	Build()
 
-func GetInputDurationFromTaskVariable(tv *task.VariableSet) (time.Duration, error) {
-	return task.GetTypedVariableFromTaskVariable[time.Duration](tv, InputDurationTaskID, 0)
-}
-
-const InputEndTimeTaskID = GCPPrefix + "input/end-time"
+var InputEndTimeTaskID = taskid.NewDefaultImplementationID[time.Time](GCPPrefix + "input/end-time")
 
 var InputEndTimeTask = form.NewInputFormDefinitionBuilder(InputEndTimeTaskID, PriorityForQueryTimeGroup+5000, "End time").
-	WithDependencies([]string{
+	WithDependencies([]taskid.UntypedTaskReference{
 		common_task.InspectionTimeTaskID,
 		TimeZoneShiftInputTaskID,
 	}).
 	WithUIDescription(`The endtime of query. Please input it in the format of RFC3339
 (example: 2006-01-02T15:04:05-07:00)`).
 	WithDocumentDescription("The endtime of the time range to gather logs.  The start time of the time range will be this endtime subtracted with the duration parameter.").
-	WithSuggestionsFunc(func(ctx context.Context, value string, variables *task.VariableSet, previousValues []string) ([]string, error) {
+	WithSuggestionsFunc(func(ctx context.Context, value string, previousValues []string) ([]string, error) {
 		return previousValues, nil
 	}).
-	WithDefaultValueFunc(func(ctx context.Context, variables *task.VariableSet, previousValues []string) (string, error) {
+	WithDefaultValueFunc(func(ctx context.Context, previousValues []string) (string, error) {
 		if len(previousValues) > 0 {
 			return previousValues[0], nil
 		}
-		inspectionTime, err := common_task.GetInspectionTimeFromTaskVariable(variables)
-		if err != nil {
-			return "", err
-		}
-		timezoneShift, err := GetTimezoneShiftInput(variables)
-		if err != nil {
-			return "", err
-		}
+		inspectionTime := task.GetTaskResult(ctx, common_task.InspectionTimeTaskID.GetTaskReference())
+		timezoneShift := task.GetTaskResult(ctx, TimeZoneShiftInputTaskID.GetTaskReference())
+
 		return inspectionTime.In(timezoneShift).Format(time.RFC3339), nil
 	}).
-	WithHintFunc(func(ctx context.Context, value string, convertedValue any, variables *task.VariableSet) (string, form_metadata.FormFieldHintType, error) {
-		inspectionTime, err := common_task.GetInspectionTimeFromTaskVariable(variables)
-		if err != nil {
-			return "", form_metadata.HintTypeInfo, err
-		}
+	WithHintFunc(func(ctx context.Context, value string, convertedValue any) (string, form_metadata.FormFieldHintType, error) {
+		inspectionTime := task.GetTaskResult(ctx, common_task.InspectionTimeTaskID.GetTaskReference())
+
 		specifiedTime := convertedValue.(time.Time)
 		if inspectionTime.Sub(specifiedTime) < 0 {
 			return fmt.Sprintf("Specified time `%s` is pointing the future. Please make sure if you specified the right value", value), form_metadata.HintTypeWarning, nil
 		}
 		return "", form_metadata.HintTypeInfo, nil
 	}).
-	WithValidator(func(ctx context.Context, value string, variables *task.VariableSet) (string, error) {
+	WithValidator(func(ctx context.Context, value string) (string, error) {
 		_, err := common.ParseTime(value)
 		if err != nil {
 			return "invalid time format. Please specify in the format of `2006-01-02T15:04:05-07:00`(RFC3339)", nil
 		}
 		return "", nil
 	}).
-	WithConverter(func(ctx context.Context, value string, variables *task.VariableSet) (any, error) {
+	WithConverter(func(ctx context.Context, value string) (time.Time, error) {
 		return common.ParseTime(value)
 	}).
 	Build()
 
-func GetInputEndTimeFromTaskVariable(tv *task.VariableSet) (time.Time, error) {
-	return task.GetTypedVariableFromTaskVariable[time.Time](tv, InputEndTimeTaskID, time.Time{})
-}
+var InputStartTimeTaskID = taskid.NewDefaultImplementationID[time.Time](GCPPrefix + "input/start-time")
 
-const InputStartTimeTaskID = GCPPrefix + "input/start-time"
-
-var InputStartTimeTask = common_task.NewInspectionProcessor(InputStartTimeTaskID, []string{
+var InputStartTimeTask = common_task.NewInspectionTask(InputStartTimeTaskID, []taskid.UntypedTaskReference{
 	InputEndTimeTaskID,
 	InputDurationTaskID,
-}, func(ctx context.Context, taskMode int, v *task.VariableSet, progress *progress.TaskProgress) (any, error) {
-	endTime, err := GetInputEndTimeFromTaskVariable(v)
-	if err != nil {
-		return nil, err
-	}
-	duration, err := GetInputDurationFromTaskVariable(v)
-	if err != nil {
-		return nil, err
-	}
+}, func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, progress *progress.TaskProgress) (time.Time, error) {
+	endTime := task.GetTaskResult(ctx, InputEndTimeTaskID.GetTaskReference())
+	duration := task.GetTaskResult(ctx, InputDurationTaskID.GetTaskReference())
 	startTime := endTime.Add(-duration)
 	// Add starttime and endtime on the header metadata
-	metadataSet, err := common_task.GetMetadataSetFromVariable(v)
-	if err != nil {
-		return nil, err
-	}
+	metadataSet := khictx.MustGetValue(ctx, inspection_task_contextkey.InspectionRunMetadata)
 
 	header, found := typedmap.Get(metadataSet, header.HeaderMetadataKey)
 	if !found {
-		return nil, fmt.Errorf("header metadata not found")
+		return time.Time{}, fmt.Errorf("header metadata not found")
 	}
 
 	header.StartTimeUnixSeconds = startTime.Unix()
@@ -299,11 +248,7 @@ var InputStartTimeTask = common_task.NewInspectionProcessor(InputStartTimeTaskID
 	return startTime, nil
 })
 
-func GetInputStartTimeFromTaskVariable(tv *task.VariableSet) (time.Time, error) {
-	return task.GetTypedVariableFromTaskVariable[time.Time](tv, InputStartTimeTaskID, time.Time{})
-}
-
-const InputKindFilterTaskID = GCPPrefix + "input/kinds"
+var InputKindFilterTaskID = taskid.NewDefaultImplementationID[*queryutil.SetFilterParseResult](GCPPrefix + "input/kinds")
 
 var inputKindNameAliasMap queryutil.SetFilterAliasToItemsMap = map[string][]string{
 	"default": strings.Split("pods replicasets daemonsets nodes deployments namespaces statefulsets services servicenetworkendpointgroups ingresses poddisruptionbudgets jobs cronjobs endpointslices persistentvolumes persistentvolumeclaims storageclasses horizontalpodautoscalers verticalpodautoscalers multidimpodautoscalers", " "),
@@ -311,7 +256,7 @@ var inputKindNameAliasMap queryutil.SetFilterAliasToItemsMap = map[string][]stri
 var InputKindFilterTask = form.NewInputFormDefinitionBuilder(InputKindFilterTaskID, PriorityForK8sResourceFilterGroup+5000, "Kind").
 	WithDefaultValueConstant("@default", true).
 	WithDocumentDescription("The kinds of resources to gather logs. `@default` is a alias of set of kinds that frequently queried. Specify `@any` to query every kinds of resources").
-	WithValidator(func(ctx context.Context, value string, variables *task.VariableSet) (string, error) {
+	WithValidator(func(ctx context.Context, value string) (string, error) {
 		if value == "" {
 			return "kind filter can't be empty", nil
 		}
@@ -321,20 +266,16 @@ var InputKindFilterTask = form.NewInputFormDefinitionBuilder(InputKindFilterTask
 		}
 		return result.ValidationError, nil
 	}).
-	WithConverter(func(ctx context.Context, value string, variables *task.VariableSet) (any, error) {
+	WithConverter(func(ctx context.Context, value string) (*queryutil.SetFilterParseResult, error) {
 		result, err := queryutil.ParseSetFilter(value, inputKindNameAliasMap, true, true, true)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		return result, nil
 	}).
 	Build()
 
-func GetInputKindNameFromTaskVariable(tv *task.VariableSet) (*queryutil.SetFilterParseResult, error) {
-	return task.GetTypedVariableFromTaskVariable[*queryutil.SetFilterParseResult](tv, InputKindFilterTaskID, nil)
-}
-
-const InputNamespaceFilterTaskID = GCPPrefix + "input/namespaces"
+var InputNamespaceFilterTaskID = taskid.NewDefaultImplementationID[*queryutil.SetFilterParseResult](GCPPrefix + "input/namespaces")
 
 var inputNamespacesAliasMap queryutil.SetFilterAliasToItemsMap = map[string][]string{
 	"all_cluster_scoped": {"#cluster-scoped"},
@@ -343,7 +284,7 @@ var inputNamespacesAliasMap queryutil.SetFilterAliasToItemsMap = map[string][]st
 var InputNamespaceFilterTask = form.NewInputFormDefinitionBuilder(InputNamespaceFilterTaskID, PriorityForK8sResourceFilterGroup+4000, "Namespaces").
 	WithDefaultValueConstant("@all_cluster_scoped @all_namespaced", true).
 	WithDocumentDescription("The namespace of resources to gather logs. Specify `@all_cluster_scoped` to gather logs for all non-namespaced resources. Specify `@all_namespaced` to gather logs for all namespaced resources.").
-	WithValidator(func(ctx context.Context, value string, variables *task.VariableSet) (string, error) {
+	WithValidator(func(ctx context.Context, value string) (string, error) {
 		if value == "" {
 			return "namespace filter can't be empty", nil
 		}
@@ -353,20 +294,16 @@ var InputNamespaceFilterTask = form.NewInputFormDefinitionBuilder(InputNamespace
 		}
 		return result.ValidationError, nil
 	}).
-	WithConverter(func(ctx context.Context, value string, variables *task.VariableSet) (any, error) {
+	WithConverter(func(ctx context.Context, value string) (*queryutil.SetFilterParseResult, error) {
 		result, err := queryutil.ParseSetFilter(value, inputNamespacesAliasMap, false, false, true)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		return result, nil
 	}).
 	Build()
 
-func GetInputNamespaceFilterFromTaskVariable(tv *task.VariableSet) (*queryutil.SetFilterParseResult, error) {
-	return task.GetTypedVariableFromTaskVariable[*queryutil.SetFilterParseResult](tv, InputNamespaceFilterTaskID, nil)
-}
-
-const InputNodeNameFilterTaskID = GCPPrefix + "input/node-name-filter"
+var InputNodeNameFilterTaskID = taskid.NewDefaultImplementationID[[]string](GCPPrefix + "input/node-name-filter")
 
 var nodeNameSubstringValidator = regexp.MustCompile("^[-a-z0-9]*$")
 
@@ -389,7 +326,7 @@ var InputNodeNameFilterTask = form.NewInputFormDefinitionBuilder(InputNodeNameFi
 	WithDefaultValueConstant("", true).
 	WithUIDescription("A space-separated list of node name substrings used to collect node-related logs. If left blank, KHI gathers logs from all nodes in the cluster.").
 	WithDocumentDescription("A space-separated list of node name substrings used to collect node-related logs. If left blank, KHI gathers logs from all nodes in the cluster.").
-	WithValidator(func(ctx context.Context, value string, variables *task.VariableSet) (string, error) {
+	WithValidator(func(ctx context.Context, value string) (string, error) {
 		nodeNameSubstrings := getNodeNameSubstringsFromRawInput(value)
 		for _, name := range nodeNameSubstrings {
 			if !nodeNameSubstringValidator.Match([]byte(name)) {
@@ -397,23 +334,15 @@ var InputNodeNameFilterTask = form.NewInputFormDefinitionBuilder(InputNodeNameFi
 			}
 		}
 		return "", nil
-	}).WithConverter(func(ctx context.Context, value string, variables *task.VariableSet) (any, error) {
+	}).WithConverter(func(ctx context.Context, value string) ([]string, error) {
 	return getNodeNameSubstringsFromRawInput(value), nil
 }).Build()
 
-func GetNodeNameFilterFromTaskVaraible(tv *task.VariableSet) ([]string, error) {
-	return task.GetTypedVariableFromTaskVariable[[]string](tv, InputNodeNameFilterTaskID, nil)
-}
-
-const InputLocationsTaskID = GCPPrefix + "input/location"
+var InputLocationsTaskID = taskid.NewDefaultImplementationID[string](GCPPrefix + "input/location")
 
 var InputLocationsTask = form.NewInputFormDefinitionBuilder(InputLocationsTaskID, PriorityForResourceIdentifierGroup+4500, "Location").WithUIDescription(
 	"A location(regions) containing the environments to inspect",
 ).Build()
-
-func GetInputLocationsFromTaskVariable(tv *task.VariableSet) (string, error) {
-	return task.GetTypedVariableFromTaskVariable[string](tv, InputLocationsTaskID, "")
-}
 
 func toTimeDurationWithTimezone(startTime time.Time, endTime time.Time, timezone *time.Location, withTimezone bool) string {
 	timeFormat := "2006-01-02T15:04:05"

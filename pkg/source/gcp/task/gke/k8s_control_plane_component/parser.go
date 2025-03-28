@@ -22,9 +22,9 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/model/history"
 	"github.com/GoogleCloudPlatform/khi/pkg/model/history/grouper"
 	"github.com/GoogleCloudPlatform/khi/pkg/parser"
-	gcp_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_control_plane_component/componentparser"
-	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	k8s_control_plane_component_taskid "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_control_plane_component/taskid"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
 type k8sControlPlaneComponentParser struct {
@@ -36,8 +36,8 @@ func (k *k8sControlPlaneComponentParser) TargetLogType() enum.LogType {
 }
 
 // Dependencies implements parser.Parser.
-func (k *k8sControlPlaneComponentParser) Dependencies() []string {
-	return []string{}
+func (k *k8sControlPlaneComponentParser) Dependencies() []taskid.UntypedTaskReference {
+	return []taskid.UntypedTaskReference{}
 }
 
 // Description implements parser.Parser.
@@ -56,17 +56,17 @@ func (k *k8sControlPlaneComponentParser) Grouper() grouper.LogGrouper {
 }
 
 // LogTask implements parser.Parser.
-func (k *k8sControlPlaneComponentParser) LogTask() string {
-	return GKEK8sControlPlaneComponentQueryTaskID
+func (k *k8sControlPlaneComponentParser) LogTask() taskid.TaskReference[[]*log.LogEntity] {
+	return k8s_control_plane_component_taskid.GKEK8sControlPlaneComponentQueryTaskID.GetTaskReference()
 }
 
 // Parse implements parser.Parser.
-func (k *k8sControlPlaneComponentParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder, variables *task.VariableSet) error {
+func (k *k8sControlPlaneComponentParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder) error {
 	component := l.GetStringOrDefault("resource.labels.component_name", "Unknown")
 	for i := 0; i < len(componentparser.ComponentParsers); i++ {
 		cp := componentparser.ComponentParsers[i]
 		if cp.ShouldProcess(component) {
-			next, err := cp.Process(ctx, l, cs, builder, variables)
+			next, err := cp.Process(ctx, l, cs, builder)
 			if err != nil {
 				return err
 			}
@@ -81,5 +81,4 @@ func (k *k8sControlPlaneComponentParser) Parse(ctx context.Context, l *log.LogEn
 
 var _ parser.Parser = (*k8sControlPlaneComponentParser)(nil)
 
-var GKEK8sControlPlaneComponentLogParseTask = parser.NewParserTaskFromParser(
-	gcp_task.GCPPrefix+"feature/controlplane-component-parser", &k8sControlPlaneComponentParser{}, true)
+var GKEK8sControlPlaneComponentLogParseTask = parser.NewParserTaskFromParser(k8s_control_plane_component_taskid.GKEK8sControlPlaneComponentParserTaskID, &k8sControlPlaneComponentParser{}, true)

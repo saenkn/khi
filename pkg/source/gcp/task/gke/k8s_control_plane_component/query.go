@@ -19,11 +19,14 @@ import (
 	"fmt"
 	"strings"
 
+	inspection_task_interface "github.com/GoogleCloudPlatform/khi/pkg/inspection/interface"
 	"github.com/GoogleCloudPlatform/khi/pkg/model/enum"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query/queryutil"
 	gcp_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task"
+	k8s_control_plane_component_taskid "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_control_plane_component/taskid"
 	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
 func GenerateK8sControlPlaneQuery(clusterName string, projectId string, controlplaneComponentFilter *queryutil.SetFilterParseResult) string {
@@ -34,26 +37,16 @@ resource.labels.project_id="%s"
 %s`, clusterName, projectId, generateK8sControlPlaneComponentFilter(controlplaneComponentFilter))
 }
 
-const GKEK8sControlPlaneComponentQueryTaskID = query.GKEQueryPrefix + "k8s-controlplane"
-
-var GKEK8sControlPlaneLogQueryTask = query.NewQueryGeneratorTask(GKEK8sControlPlaneComponentQueryTaskID, "K8s control plane logs", enum.LogTypeControlPlaneComponent, []string{
+var GKEK8sControlPlaneLogQueryTask = query.NewQueryGeneratorTask(k8s_control_plane_component_taskid.GKEK8sControlPlaneComponentQueryTaskID, "K8s control plane logs", enum.LogTypeControlPlaneComponent, []taskid.UntypedTaskReference{
 	gcp_task.InputProjectIdTaskID,
 	gcp_task.InputClusterNameTaskID,
-	InputControlPlaneComponentNameFilterTaskID,
-}, func(ctx context.Context, i int, vs *task.VariableSet) ([]string, error) {
-	clusterName, err := gcp_task.GetInputClusterNameFromTaskVariable(vs)
-	if err != nil {
-		return []string{}, err
-	}
-	projectId, err := gcp_task.GetInputProjectIdFromTaskVariable(vs)
-	if err != nil {
-		return []string{}, err
-	}
-	controlPlaneComponentNameFilter, err := GetInputControlPlaneComponentNameFilterFromTaskVariable(vs)
-	if err != nil {
-		return []string{}, err
-	}
-	return []string{GenerateK8sControlPlaneQuery(clusterName, projectId, controlPlaneComponentNameFilter)}, nil
+	k8s_control_plane_component_taskid.InputControlPlaneComponentNameFilterTaskID,
+}, func(ctx context.Context, i inspection_task_interface.InspectionTaskMode) ([]string, error) {
+	clusterName := task.GetTaskResult(ctx, gcp_task.InputClusterNameTaskID.GetTaskReference())
+	projectId := task.GetTaskResult(ctx, gcp_task.InputProjectIdTaskID.GetTaskReference())
+	controlplaneComponentNameFilter := task.GetTaskResult(ctx, k8s_control_plane_component_taskid.InputControlPlaneComponentNameFilterTaskID.GetTaskReference())
+
+	return []string{GenerateK8sControlPlaneQuery(clusterName, projectId, controlplaneComponentNameFilter)}, nil
 }, GenerateK8sControlPlaneQuery("gcp-cluster-name", "gcp-project-id", &queryutil.SetFilterParseResult{
 	SubtractMode: true,
 }))

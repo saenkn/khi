@@ -27,10 +27,10 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/model/history/grouper"
 	"github.com/GoogleCloudPlatform/khi/pkg/model/history/resourcepath"
 	"github.com/GoogleCloudPlatform/khi/pkg/parser"
-	gcp_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task"
-	composer_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/cloud-composer"
+	composer_inspection_type "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/cloud-composer/inspectiontype"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke"
-	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	network_api_taskid "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/network_api/taskid"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 	"gopkg.in/yaml.v3"
 )
 
@@ -42,8 +42,8 @@ func (g *gceNetworkParser) TargetLogType() enum.LogType {
 }
 
 // Dependencies implements parser.Parser.
-func (*gceNetworkParser) Dependencies() []string {
-	return []string{}
+func (*gceNetworkParser) Dependencies() []taskid.UntypedTaskReference {
+	return []taskid.UntypedTaskReference{}
 }
 
 // Description implements parser.Parser.
@@ -57,8 +57,8 @@ func (*gceNetworkParser) GetParserName() string {
 }
 
 // LogTask implements parser.Parser.
-func (*gceNetworkParser) LogTask() string {
-	return GCPNetworkLogQueryTaskID
+func (*gceNetworkParser) LogTask() taskid.TaskReference[[]*log.LogEntity] {
+	return network_api_taskid.GCPNetworkLogQueryTaskID.GetTaskReference()
 }
 
 func (*gceNetworkParser) Grouper() grouper.LogGrouper {
@@ -66,7 +66,7 @@ func (*gceNetworkParser) Grouper() grouper.LogGrouper {
 }
 
 // Parse implements parser.Parser.
-func (*gceNetworkParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder, variables *task.VariableSet) error {
+func (*gceNetworkParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder) error {
 	isFirst := l.Has("operation.first")
 	isLast := l.Has("operation.last")
 	operationId := l.GetStringOrDefault("operation.id", "unknown")
@@ -155,4 +155,4 @@ func (*gceNetworkParser) Parse(ctx context.Context, l *log.LogEntity, cs *histor
 
 var _ parser.Parser = (*gceNetworkParser)(nil)
 
-var NetowrkAPIParserTask = parser.NewParserTaskFromParser(gcp_task.GCPPrefix+"feature/network-api-parser", &gceNetworkParser{}, true, inspection_task.InspectionTypeLabel(gke.InspectionTypeId, composer_task.InspectionTypeId))
+var NetowrkAPIParserTask = parser.NewParserTaskFromParser(network_api_taskid.GCPNetworkLogParserTaskID, &gceNetworkParser{}, true, inspection_task.InspectionTypeLabel(gke.InspectionTypeId, composer_inspection_type.InspectionTypeId))

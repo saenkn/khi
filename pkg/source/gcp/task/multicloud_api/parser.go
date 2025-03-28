@@ -27,10 +27,10 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/model/history/grouper"
 	"github.com/GoogleCloudPlatform/khi/pkg/model/history/resourcepath"
 	"github.com/GoogleCloudPlatform/khi/pkg/parser"
-	gcp_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task"
 	aws "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke-on-aws"
 	azure "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke-on-azure"
-	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/multicloud_api/multicloud_api_taskid"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
 type multiCloudAuditLogParser struct {
@@ -42,8 +42,8 @@ func (m *multiCloudAuditLogParser) TargetLogType() enum.LogType {
 }
 
 // Dependencies implements parser.Parser.
-func (*multiCloudAuditLogParser) Dependencies() []string {
-	return []string{}
+func (*multiCloudAuditLogParser) Dependencies() []taskid.UntypedTaskReference {
+	return []taskid.UntypedTaskReference{}
 }
 
 // Description implements parser.Parser.
@@ -57,8 +57,8 @@ func (*multiCloudAuditLogParser) GetParserName() string {
 }
 
 // LogTask implements parser.Parser.
-func (*multiCloudAuditLogParser) LogTask() string {
-	return MultiCloudAPIQueryTaskID
+func (*multiCloudAuditLogParser) LogTask() taskid.TaskReference[[]*log.LogEntity] {
+	return multicloud_api_taskid.MultiCloudAPIQueryTaskID.GetTaskReference()
 }
 
 func (*multiCloudAuditLogParser) Grouper() grouper.LogGrouper {
@@ -66,7 +66,7 @@ func (*multiCloudAuditLogParser) Grouper() grouper.LogGrouper {
 }
 
 // Parse implements parser.Parser.
-func (*multiCloudAuditLogParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder, variables *task.VariableSet) error {
+func (*multiCloudAuditLogParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder) error {
 	resourceName := l.GetStringOrDefault("protoPayload.resourceName", "")
 	resource := parseResourceNameOfMulticloudAPI(resourceName)
 	isFirst := l.Has("operation.first")
@@ -174,7 +174,7 @@ func (*multiCloudAuditLogParser) Parse(ctx context.Context, l *log.LogEntity, cs
 
 var _ parser.Parser = (*multiCloudAuditLogParser)(nil)
 
-var MultiCloudAuditLogParseJob = parser.NewParserTaskFromParser(gcp_task.GCPPrefix+"feature/multicloud-audit-parser", &multiCloudAuditLogParser{}, true, inspection_task.InspectionTypeLabel(aws.InspectionTypeId, azure.InspectionTypeId))
+var MultiCloudAuditLogParseJob = parser.NewParserTaskFromParser(multicloud_api_taskid.MultiCloudAPIParserTaskID, &multiCloudAuditLogParser{}, true, inspection_task.InspectionTypeLabel(aws.InspectionTypeId, azure.InspectionTypeId))
 
 type multiCloudResource struct {
 	ClusterType  string // aws or azure

@@ -20,31 +20,25 @@ import (
 	"slices"
 	"strings"
 
+	inspection_task_interface "github.com/GoogleCloudPlatform/khi/pkg/inspection/interface"
 	"github.com/GoogleCloudPlatform/khi/pkg/model/enum"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/query/queryutil"
 	gcp_task "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_audit/k8saudittask"
 	"github.com/GoogleCloudPlatform/khi/pkg/task"
+	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
-var Task = query.NewQueryGeneratorTask(k8saudittask.K8sAuditQueryTaskID, "K8s audit logs", enum.LogTypeAudit, []string{
+var Task = query.NewQueryGeneratorTask(k8saudittask.K8sAuditQueryTaskID, "K8s audit logs", enum.LogTypeAudit, []taskid.UntypedTaskReference{
 	gcp_task.InputClusterNameTaskID,
 	gcp_task.InputKindFilterTaskID,
 	gcp_task.InputNamespaceFilterTaskID,
-}, func(ctx context.Context, i int, vs *task.VariableSet) ([]string, error) {
-	clusterName, err := gcp_task.GetInputClusterNameFromTaskVariable(vs)
-	if err != nil {
-		return []string{}, err
-	}
-	kindFilter, err := gcp_task.GetInputKindNameFromTaskVariable(vs)
-	if err != nil {
-		return []string{}, err
-	}
-	namespaceFilter, err := gcp_task.GetInputNamespaceFilterFromTaskVariable(vs)
-	if err != nil {
-		return []string{}, err
-	}
+}, func(ctx context.Context, i inspection_task_interface.InspectionTaskMode) ([]string, error) {
+	clusterName := task.GetTaskResult(ctx, gcp_task.InputClusterNameTaskID.GetTaskReference())
+	kindFilter := task.GetTaskResult(ctx, gcp_task.InputKindFilterTaskID.GetTaskReference())
+	namespaceFilter := task.GetTaskResult(ctx, gcp_task.InputNamespaceFilterTaskID.GetTaskReference())
+
 	return []string{GenerateK8sAuditQuery(clusterName, kindFilter, namespaceFilter)}, nil
 }, GenerateK8sAuditQuery(
 	"gcp-cluster-name",

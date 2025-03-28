@@ -21,6 +21,9 @@ import (
 	"os"
 	"sync"
 
+	"github.com/GoogleCloudPlatform/khi/pkg/common/khictx"
+	inspection_task_contextkey "github.com/GoogleCloudPlatform/khi/pkg/inspection/contextkey"
+	task_contextkey "github.com/GoogleCloudPlatform/khi/pkg/task/contextkey"
 	"github.com/GoogleCloudPlatform/khi/pkg/task/taskid"
 )
 
@@ -83,12 +86,12 @@ func (g *globalLoggerHandler) getHandler(ctx context.Context) slog.Handler {
 }
 
 func (g *globalLoggerHandler) routeHandler(ctx context.Context) slog.Handler {
-	iidAny := ctx.Value("iid") // inspection id
-	tidAny := ctx.Value("tid") // task id
-	ridAny := ctx.Value("rid")
-	if iid, converted := iidAny.(string); converted {
-		if tid, converted := tidAny.(taskid.TaskImplementationId); converted {
-			if rid, converted := ridAny.(string); converted {
+	tid, err := khictx.GetValue(ctx, task_contextkey.TaskImplementationIDContextKey)
+	if err == nil {
+		iid, err := khictx.GetValue(ctx, inspection_task_contextkey.InspectionTaskInspectionID)
+		if err == nil {
+			rid, err := khictx.GetValue(ctx, inspection_task_contextkey.InspectionTaskRunID)
+			if err == nil {
 				g.handlersLock.Lock()
 				defer g.handlersLock.Unlock()
 				loggerId := fmt.Sprintf("%s-%s-%s", iid, tid.String(), rid)
@@ -104,20 +107,20 @@ func (g *globalLoggerHandler) routeHandler(ctx context.Context) slog.Handler {
 	return g.defaultHandler
 }
 
-func (g *globalLoggerHandler) RegisterTaskLogger(inspectionId string, taskId string, runId string, handler slog.Handler) {
+func (g *globalLoggerHandler) RegisterTaskLogger(inspectionId string, taskId taskid.UntypedTaskImplementationID, runId string, handler slog.Handler) {
 	g.handlersLock.Lock()
 	defer g.handlersLock.Unlock()
-	loggerId := fmt.Sprintf("%s-%s-%s", inspectionId, taskId, runId)
+	loggerId := fmt.Sprintf("%s-%s-%s", inspectionId, taskId.String(), runId)
 	if _, found := (*g.handlers)[loggerId]; found {
 		slog.Warn(fmt.Sprintf("duplicated logger found for %s. Ignoreing...", loggerId))
 	} else {
 		(*g.handlers)[loggerId] = handler
 	}
 }
-func (g *globalLoggerHandler) UnregisterTaskLogger(inspectionId string, taskId string, runId string, handler slog.Handler) {
+func (g *globalLoggerHandler) UnregisterTaskLogger(inspectionId string, taskId taskid.UntypedTaskImplementationID, runId string, handler slog.Handler) {
 	g.handlersLock.Lock()
 	defer g.handlersLock.Unlock()
-	loggerId := fmt.Sprintf("%s-%s-%s", inspectionId, taskId, runId)
+	loggerId := fmt.Sprintf("%s-%s-%s", inspectionId, taskId.String(), runId)
 	delete((*g.handlers), loggerId)
 }
 
@@ -137,6 +140,6 @@ func localInitInspectionLogger(defaultHandler slog.Handler) *globalLoggerHandler
 	return handler
 }
 
-func RegisterTaskLogger(inspectionId string, taskId string, runId string, handler slog.Handler) {
+func RegisterTaskLogger(inspectionId string, taskId taskid.UntypedTaskImplementationID, runId string, handler slog.Handler) {
 	globalLogHandler.RegisterTaskLogger(inspectionId, taskId, runId, handler)
 }
