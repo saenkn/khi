@@ -55,23 +55,23 @@ type InspectionRunResult struct {
 
 // InspectionTaskServer manages tasks and provides apis to get task related information in JSON convertible type.
 type InspectionTaskServer struct {
-	// RootTaskSet is the set of the all definitions in KHI.
-	RootTaskSet *task.DefinitionSet
+	// RootTaskSet is the set of the all tasks in KHI.
+	RootTaskSet *task.TaskSet
 	// inspectionTypes are kinds of tasks. Users will select this at first to filter togglable feature tasks.
 	inspectionTypes []*InspectionType
 	// tasks are generated tasks
-	tasks map[string]*InspectionRunner
+	tasks map[string]*InspectionTaskRunner
 }
 
 func NewServer() (*InspectionTaskServer, error) {
-	ns, err := task.NewSet([]task.UntypedDefinition{})
+	ns, err := task.NewSet([]task.UntypedTask{})
 	if err != nil {
 		return nil, err
 	}
 	return &InspectionTaskServer{
 		RootTaskSet:     ns,
 		inspectionTypes: make([]*InspectionType, 0),
-		tasks:           map[string]*InspectionRunner{},
+		tasks:           map[string]*InspectionTaskRunner{},
 	}, nil
 }
 
@@ -94,9 +94,9 @@ func (s *InspectionTaskServer) AddInspectionType(newInspectionType InspectionTyp
 	return nil
 }
 
-// AddTaskDefinition register a task definition usable for the inspection tasks
-func (s *InspectionTaskServer) AddTaskDefinition(taskDefinition task.UntypedDefinition) error {
-	return s.RootTaskSet.Add(taskDefinition)
+// AddTask register a task usable for the inspection task graph execution.
+func (s *InspectionTaskServer) AddTask(task task.UntypedTask) error {
+	return s.RootTaskSet.Add(task)
 }
 
 // CreateInspection generates an inspection and returns inspection ID
@@ -111,7 +111,7 @@ func (s *InspectionTaskServer) CreateInspection(inspectionType string) (string, 
 }
 
 // Inspection returns an instance of an Inspection queried with given inspection ID.
-func (s *InspectionTaskServer) GetTask(taskId string) *InspectionRunner {
+func (s *InspectionTaskServer) GetTask(taskId string) *InspectionTaskRunner {
 	return s.tasks[taskId]
 }
 
@@ -128,15 +128,15 @@ func (s *InspectionTaskServer) GetInspectionType(inspectionTypeId string) *Inspe
 	return nil
 }
 
-func (s *InspectionTaskServer) GetAllRunners() []*InspectionRunner {
-	inspections := []*InspectionRunner{}
+func (s *InspectionTaskServer) GetAllRunners() []*InspectionTaskRunner {
+	inspections := []*InspectionTaskRunner{}
 	for _, value := range s.tasks {
 		inspections = append(inspections, value)
 	}
 	return inspections
 }
 
-// GetAllRegisteredTasks returns a cloned list of all definitions registered in this server.
-func (s *InspectionTaskServer) GetAllRegisteredTasks() []task.UntypedDefinition {
+// GetAllRegisteredTasks returns a cloned list of all tasks registered in this server.
+func (s *InspectionTaskServer) GetAllRegisteredTasks() []task.UntypedTask {
 	return s.RootTaskSet.GetAll()
 }

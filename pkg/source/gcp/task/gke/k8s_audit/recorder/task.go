@@ -43,12 +43,12 @@ type LogFilterFunc = func(ctx context.Context, l *types.ResourceSpecificParserIn
 type RecorderFunc = func(ctx context.Context, resourcePath string, currentLog *types.ResourceSpecificParserInput, prevStateInGroup any, cs *history.ChangeSet, builder *history.Builder) (any, error)
 
 type RecorderTaskManager struct {
-	recorderTasks []task.UntypedDefinition
+	recorderTasks []task.UntypedTask
 }
 
 func NewTaskManager() *RecorderTaskManager {
 	return &RecorderTaskManager{
-		recorderTasks: make([]task.UntypedDefinition, 0),
+		recorderTasks: make([]task.UntypedTask, 0),
 	}
 }
 
@@ -117,7 +117,7 @@ func (r *RecorderTaskManager) GetRecorderTaskName(recorderName string) taskid.Ta
 func (r *RecorderTaskManager) Register(server *inspection.InspectionTaskServer) error {
 	recorderTaskIds := []taskid.UntypedTaskReference{}
 	for _, recorder := range r.recorderTasks {
-		err := server.AddTaskDefinition(recorder)
+		err := server.AddTask(recorder)
 		if err != nil {
 			return err
 		}
@@ -126,7 +126,7 @@ func (r *RecorderTaskManager) Register(server *inspection.InspectionTaskServer) 
 	waiterTask := inspection_task.NewInspectionTask(taskid.NewDefaultImplementationID[any](fmt.Sprintf("%s/feature/audit-parser-v2", gcp_task.GCPPrefix)), recorderTaskIds, func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, progress *progress.TaskProgress) (any, error) {
 		return struct{}{}, nil
 	}, inspection_task.FeatureTaskLabel("Kubernetes Audit Log", `Gather kubernetes audit logs and visualize resource modifications.`, enum.LogTypeAudit, true))
-	err := server.AddTaskDefinition(waiterTask)
+	err := server.AddTask(waiterTask)
 	return err
 }
 

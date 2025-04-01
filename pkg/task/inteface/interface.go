@@ -20,7 +20,7 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/common/typedmap"
 )
 
-// TaskRunner receives the runnable DefinitionSet and run tasks with topological sorted order.
+// TaskRunner receives the runnable TaskSet and run tasks with topological sorted order.
 type TaskRunner interface {
 	Run(ctx context.Context) error
 	Wait() <-chan interface{}

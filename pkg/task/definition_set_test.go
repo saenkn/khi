@@ -27,47 +27,47 @@ import (
 	_ "github.com/GoogleCloudPlatform/khi/internal/testflags"
 )
 
-type testTaskDefinition struct {
+type testTask struct {
 	id           taskid.TaskImplementationID[any]
 	dependencies []taskid.UntypedTaskReference
 	labels       *typedmap.ReadonlyTypedMap
 }
 
-// Run implements Definition.
-func (d *testTaskDefinition) Run(ctx context.Context) (any, error) {
+// Run implements Task.
+func (d *testTask) Run(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
-func (d *testTaskDefinition) UntypedRun(ctx context.Context) (any, error) {
+func (d *testTask) UntypedRun(ctx context.Context) (any, error) {
 	return nil, nil
 }
 
-var _ Definition[any] = (*testTaskDefinition)(nil)
+var _ Task[any] = (*testTask)(nil)
 
-func (d *testTaskDefinition) ID() taskid.TaskImplementationID[any] {
+func (d *testTask) ID() taskid.TaskImplementationID[any] {
 	return d.id
 }
 
-func (d *testTaskDefinition) UntypedID() taskid.UntypedTaskImplementationID {
+func (d *testTask) UntypedID() taskid.UntypedTaskImplementationID {
 	return d.id
 }
 
-func (d *testTaskDefinition) Labels() *typedmap.ReadonlyTypedMap {
+func (d *testTask) Labels() *typedmap.ReadonlyTypedMap {
 	return d.labels
 }
 
 // Dependencies implements KHITaskUnit.
-func (d *testTaskDefinition) Dependencies() []taskid.UntypedTaskReference {
+func (d *testTask) Dependencies() []taskid.UntypedTaskReference {
 	return d.dependencies
 }
 
 // assertSortTaskGraph is a test helper that verifies the sortTaskGraph results
 // match the expected task IDs, missing dependencies, etc.
-func assertSortTaskGraph(t *testing.T, tasks []UntypedDefinition, expectedTaskIDs []string, expectedMissing []string, expectedRunnable bool, expectedHasCyclicDependency bool) {
+func assertSortTaskGraph(t *testing.T, tasks []UntypedTask, expectedTaskIDs []string, expectedMissing []string, expectedRunnable bool, expectedHasCyclicDependency bool) {
 	t.Helper() // Mark this as a helper function to improve test output
 
 	// Create task set and run the sort
-	taskSet := &DefinitionSet{definitions: tasks}
+	taskSet := &TaskSet{tasks: tasks}
 	result := taskSet.sortTaskGraph()
 
 	// Compare actual vs expected runnable status
@@ -114,14 +114,14 @@ func assertSortTaskGraph(t *testing.T, tasks []UntypedDefinition, expectedTaskID
 	}
 }
 
-func newDebugDefinition(id string, dependencies []string, labelOpt ...LabelOpt) *testTaskDefinition {
+func newDebugTask(id string, dependencies []string, labelOpt ...LabelOpt) *testTask {
 	labels := NewLabelSet(labelOpt...)
 	dependencyReferenceIds := []taskid.UntypedTaskReference{}
 	for _, id := range dependencies {
 		dependencyReferenceIds = append(dependencyReferenceIds, taskid.NewTaskReference[any](id))
 	}
 
-	return &testTaskDefinition{
+	return &testTask{
 		id:           taskid.NewDefaultImplementationID[any](id),
 		dependencies: dependencyReferenceIds,
 		labels:       labels,
@@ -129,11 +129,11 @@ func newDebugDefinition(id string, dependencies []string, labelOpt ...LabelOpt) 
 }
 
 func TestSortTaskGraphWithValidGraph(t *testing.T) {
-	tasks := []UntypedDefinition{
-		newDebugDefinition("foo", []string{"bar"}),
-		newDebugDefinition("bar", []string{}),
-		newDebugDefinition("qux", []string{"quux"}),
-		newDebugDefinition("quux", []string{"foo", "bar"}),
+	tasks := []UntypedTask{
+		newDebugTask("foo", []string{"bar"}),
+		newDebugTask("bar", []string{}),
+		newDebugTask("qux", []string{"quux"}),
+		newDebugTask("quux", []string{"foo", "bar"}),
 	}
 
 	// Expected order after topological sort
@@ -146,11 +146,11 @@ func TestSortTaskGraphWithValidGraph(t *testing.T) {
 func TestSortTaskGraphReturnsTheStableResult(t *testing.T) {
 	COUNT := 100
 	for i := 0; i < COUNT; i++ {
-		tasks := []UntypedDefinition{
-			newDebugDefinition("foo", []string{}),
-			newDebugDefinition("bar", []string{"foo"}),
-			newDebugDefinition("qux", []string{"foo"}),
-			newDebugDefinition("quux", []string{"foo"}),
+		tasks := []UntypedTask{
+			newDebugTask("foo", []string{}),
+			newDebugTask("bar", []string{"foo"}),
+			newDebugTask("qux", []string{"foo"}),
+			newDebugTask("quux", []string{"foo"}),
 		}
 
 		// Expected order after topological sort
@@ -162,11 +162,11 @@ func TestSortTaskGraphReturnsTheStableResult(t *testing.T) {
 }
 
 func TestSortTaskGraphWithMissingDependency(t *testing.T) {
-	tasks := []UntypedDefinition{
-		newDebugDefinition("foo", []string{"bar", "missing-input2"}),
-		newDebugDefinition("bar", []string{}),
-		newDebugDefinition("qux", []string{"quux", "missing-input1"}),
-		newDebugDefinition("quux", []string{"foo", "bar"}),
+	tasks := []UntypedTask{
+		newDebugTask("foo", []string{"bar", "missing-input2"}),
+		newDebugTask("bar", []string{}),
+		newDebugTask("qux", []string{"quux", "missing-input1"}),
+		newDebugTask("quux", []string{"foo", "bar"}),
 	}
 
 	// Graph has missing dependencies, so we expect it to be not runnable
@@ -177,11 +177,11 @@ func TestSortTaskGraphWithMissingDependency(t *testing.T) {
 }
 
 func TestResolveGraphWithCircularDependency(t *testing.T) {
-	tasks := []UntypedDefinition{
-		newDebugDefinition("foo", []string{"bar", "qux"}),
-		newDebugDefinition("bar", []string{}),
-		newDebugDefinition("qux", []string{"quux"}),
-		newDebugDefinition("quux", []string{"foo", "bar"}),
+	tasks := []UntypedTask{
+		newDebugTask("foo", []string{"bar", "qux"}),
+		newDebugTask("bar", []string{}),
+		newDebugTask("qux", []string{"quux"}),
+		newDebugTask("quux", []string{"foo", "bar"}),
 	}
 
 	// This graph has a cycle, so we expect it to be not runnable
@@ -191,11 +191,11 @@ func TestResolveGraphWithCircularDependency(t *testing.T) {
 
 // assertResolveTask is a test helper that verifies the ResolveTask results
 // match the expected task IDs and selection priorities.
-func assertResolveTask(t *testing.T, tasks []UntypedDefinition, availableTasks []UntypedDefinition, expectedTaskIDs []string) {
+func assertResolveTask(t *testing.T, tasks []UntypedTask, availableTasks []UntypedTask, expectedTaskIDs []string) {
 	t.Helper() // Mark this as a helper function to improve test output
 
 	// Create task sets
-	taskSet := &DefinitionSet{definitions: tasks}
+	taskSet := &TaskSet{tasks: tasks}
 	availableSet, err := NewSet(availableTasks)
 	if err != nil {
 		t.Fatalf("Failed to create available task set: %v", err)
@@ -213,8 +213,8 @@ func assertResolveTask(t *testing.T, tasks []UntypedDefinition, availableTasks [
 	}
 
 	// Extract and verify the task IDs in the expected order
-	actualTaskIDs := make([]string, 0, len(resolvedTaskSet.definitions))
-	for _, task := range resolvedTaskSet.definitions {
+	actualTaskIDs := make([]string, 0, len(resolvedTaskSet.tasks))
+	for _, task := range resolvedTaskSet.tasks {
 		actualTaskIDs = append(actualTaskIDs, task.UntypedID().ReferenceIDString())
 	}
 
@@ -226,7 +226,7 @@ func assertResolveTask(t *testing.T, tasks []UntypedDefinition, availableTasks [
 func TestWrapGraph(t *testing.T) {
 	testCases := []struct {
 		ResolvedShape string
-		Definitions   []UntypedDefinition
+		Tasks         []UntypedTask
 	}{
 		{
 			//https://dreampuf.github.io/GraphvizOnline/#digraph%20G%20%7B%0Astart%20%5Bshape%3D%22diamond%22%2Cfillcolor%3Dgray%2Cstyle%3Dfilled%5D%0Atest_init%20%5Bshape%3D%22circle%22%2Clabel%3D%22test-init%22%5D%0Atest_done%20%5Bshape%3D%22circle%22%2Clabel%3D%22test-done%22%5D%0Astart%20-%3E%20test_init%0Atest_init%20-%3E%20test_done%0A%7D
@@ -237,7 +237,7 @@ test_done_default [shape="circle",label="test-done#default"]
 start -> test_init_default
 test_init_default -> test_done_default
 }`,
-			Definitions: []UntypedDefinition{},
+			Tasks: []UntypedTask{},
 		},
 		{
 			//https://dreampuf.github.io/GraphvizOnline/#digraph%20G%20%7B%0Astart%20%5Bshape%3D%22diamond%22%2Cfillcolor%3Dgray%2Cstyle%3Dfilled%5D%0Atest_init%20%5Bshape%3D%22circle%22%2Clabel%3D%22test-init%22%5D%0Abar%20%5Bshape%3D%22circle%22%2Clabel%3D%22bar%22%5D%0Afoo%20%5Bshape%3D%22circle%22%2Clabel%3D%22foo%22%5D%0Aquux%20%5Bshape%3D%22circle%22%2Clabel%3D%22quux%22%5D%0Aquz%20%5Bshape%3D%22circle%22%2Clabel%3D%22quz%22%5D%0Atest_done%20%5Bshape%3D%22circle%22%2Clabel%3D%22test-done%22%5D%0Astart%20-%3E%20test_init%0Atest_init%20-%3E%20bar%0Atest_init%20-%3E%20foo%0Atest_init%20-%3E%20quux%0Atest_init%20-%3E%20quz%0Atest_init%20-%3E%20test_done%0Afoo%20-%3E%20test_done%0Abar%20-%3E%20test_done%0Aquz%20-%3E%20test_done%0Aquux%20-%3E%20test_done%0A%7D
@@ -260,11 +260,11 @@ quux_default -> test_done_default
 quz_default -> test_done_default
 test_init_default -> test_done_default
 }`,
-			Definitions: []UntypedDefinition{
-				newDebugDefinition("foo", []string{}),
-				newDebugDefinition("bar", []string{}),
-				newDebugDefinition("quz", []string{}),
-				newDebugDefinition("quux", []string{}),
+			Tasks: []UntypedTask{
+				newDebugTask("foo", []string{}),
+				newDebugTask("bar", []string{}),
+				newDebugTask("quz", []string{}),
+				newDebugTask("quux", []string{}),
 			},
 		},
 		{
@@ -287,18 +287,18 @@ bar_default -> test_done_default
 quux_default -> test_done_default
 test_init_default -> test_done_default
 }`,
-			Definitions: []UntypedDefinition{
-				newDebugDefinition("foo", []string{}),
-				newDebugDefinition("bar", []string{"foo", "quz"}),
-				newDebugDefinition("quz", []string{}),
-				newDebugDefinition("quux", []string{}),
+			Tasks: []UntypedTask{
+				newDebugTask("foo", []string{}),
+				newDebugTask("bar", []string{"foo", "quz"}),
+				newDebugTask("quz", []string{}),
+				newDebugTask("quux", []string{}),
 			},
 		},
 	}
 
 	for i, testCase := range testCases {
 		t.Run(fmt.Sprintf("testcase-%d", i), func(t *testing.T) {
-			originalSet, err := NewSet(testCase.Definitions)
+			originalSet, err := NewSet(testCase.Tasks)
 			if err != nil {
 				t.Errorf("unexpected error %v", err)
 			}
@@ -323,9 +323,9 @@ test_init_default -> test_done_default
 		})
 		t.Run(fmt.Sprintf("testcase-%d-stable-check", i), func(t *testing.T) {
 			COUNT := 0
-			var prev *DefinitionSet
+			var prev *TaskSet
 			for i := 0; i < COUNT; i++ {
-				originalSet, err := NewSet(testCase.Definitions)
+				originalSet, err := NewSet(testCase.Tasks)
 				if err != nil {
 					t.Errorf("unexpected error %v", err)
 				}
@@ -350,15 +350,15 @@ test_init_default -> test_done_default
 }
 
 func TestResolveTaskWithValidTaskSet(t *testing.T) {
-	tasks := []UntypedDefinition{
-		newDebugDefinition("foo", []string{"bar"}),
-		newDebugDefinition("bar", []string{"qux"}),
+	tasks := []UntypedTask{
+		newDebugTask("foo", []string{"bar"}),
+		newDebugTask("bar", []string{"qux"}),
 	}
 
-	availableTasks := []UntypedDefinition{
-		newDebugDefinition("qux", []string{"quux"}),
-		newDebugDefinition("quux", []string{}),
-		newDebugDefinition("hoge", []string{"fuga"}),
+	availableTasks := []UntypedTask{
+		newDebugTask("qux", []string{"quux"}),
+		newDebugTask("quux", []string{}),
+		newDebugTask("hoge", []string{"fuga"}),
 	}
 
 	// Expected resolved tasks in topological order
@@ -368,17 +368,17 @@ func TestResolveTaskWithValidTaskSet(t *testing.T) {
 }
 
 func TestDumpGraphviz(t *testing.T) {
-	featureTasks := []UntypedDefinition{
-		newDebugDefinition("foo", []string{"bar"}),
-		newDebugDefinition("bar", []string{"qux", "quux"}),
+	featureTasks := []UntypedTask{
+		newDebugTask("foo", []string{"bar"}),
+		newDebugTask("bar", []string{"qux", "quux"}),
 	}
-	featureTaskSet := DefinitionSet{definitions: featureTasks, runnable: false}
-	availableTasks := []UntypedDefinition{
-		newDebugDefinition("qux", []string{}),
-		newDebugDefinition("quux", []string{}),
-		newDebugDefinition("hoge", []string{"fuga"}),
+	featureTaskSet := TaskSet{tasks: featureTasks, runnable: false}
+	availableTasks := []UntypedTask{
+		newDebugTask("qux", []string{}),
+		newDebugTask("quux", []string{}),
+		newDebugTask("hoge", []string{"fuga"}),
 	}
-	availableTaskSet := DefinitionSet{definitions: availableTasks, runnable: false}
+	availableTaskSet := TaskSet{tasks: availableTasks, runnable: false}
 
 	resolvedTaskSet, err := featureTaskSet.ResolveTask(&availableTaskSet)
 	if err != nil {
@@ -409,17 +409,17 @@ bar_default -> foo_default
 func TestDumpGraphvizReturnsStableResult(t *testing.T) {
 	COUNT := 100
 	for i := 0; i < COUNT; i++ {
-		featureTasks := []UntypedDefinition{
-			newDebugDefinition("foo", []string{"qux", "quux", "hoge"}),
+		featureTasks := []UntypedTask{
+			newDebugTask("foo", []string{"qux", "quux", "hoge"}),
 		}
-		featureTaskSet := DefinitionSet{definitions: featureTasks, runnable: false}
-		availableTasks := []UntypedDefinition{
-			newDebugDefinition("qux", []string{}),
-			newDebugDefinition("quux", []string{}),
-			newDebugDefinition("hoge", []string{"fuga"}),
-			newDebugDefinition("fuga", []string{}),
+		featureTaskSet := TaskSet{tasks: featureTasks, runnable: false}
+		availableTasks := []UntypedTask{
+			newDebugTask("qux", []string{}),
+			newDebugTask("quux", []string{}),
+			newDebugTask("hoge", []string{"fuga"}),
+			newDebugTask("fuga", []string{}),
 		}
-		availableTaskSet := DefinitionSet{definitions: availableTasks, runnable: false}
+		availableTaskSet := TaskSet{tasks: availableTasks, runnable: false}
 
 		resolvedTaskSet, err := featureTaskSet.ResolveTask(&availableTaskSet)
 		if err != nil {
@@ -455,27 +455,27 @@ hoge_default -> foo_default
 }
 
 func TestAddDefinitionToSet(t *testing.T) {
-	ds, err := NewSet([]UntypedDefinition{})
+	ds, err := NewSet([]UntypedTask{})
 	if err != nil {
 		t.Errorf("unexpected err:%s", err)
 	}
 
-	err = ds.Add(newDebugDefinition("bar", []string{"qux", "quux"}))
+	err = ds.Add(newDebugTask("bar", []string{"qux", "quux"}))
 	if err != nil {
 		t.Errorf("unexpected err:%s", err)
 	}
 
 	// Add a task with same ID
-	err = ds.Add(newDebugDefinition("bar", []string{"qux2", "quux2"}))
+	err = ds.Add(newDebugTask("bar", []string{"qux2", "quux2"}))
 	if err == nil {
 		t.Errorf("expected error, but returned no error")
 	}
 }
 
 func TestNewSetWithDuplicatedID(t *testing.T) {
-	_, err := NewSet([]UntypedDefinition{
-		newDebugDefinition("bar", []string{"qux", "quux"}),
-		newDebugDefinition("bar", []string{"qux", "quux"}),
+	_, err := NewSet([]UntypedTask{
+		newDebugTask("bar", []string{"qux", "quux"}),
+		newDebugTask("bar", []string{"qux", "quux"}),
 	})
 	if err == nil {
 		t.Errorf("expected error, but returned no error")

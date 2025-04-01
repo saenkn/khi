@@ -75,9 +75,9 @@ timestamp: 2024-01-01T00:00:00+09:00`
 		}
 
 		ctx := inspection_task_test.WithDefaultTestInspectionTaskContext(context.Background())
-		result, _, err := inspection_task_test.RunInspectionTaskWithDependency(ctx, Task, []task.UntypedDefinition{
+		result, _, err := inspection_task_test.RunInspectionTaskWithDependency(ctx, Task, []task.UntypedTask{
 			v2commonlogparse.Task,
-			task_test.MockTask(query.Task, logs, nil),
+			task_test.StubTask(query.Task, logs, nil),
 		}, inspection_task_interface.TaskModeRun, map[string]any{})
 		if err != nil {
 			t.Error(err)

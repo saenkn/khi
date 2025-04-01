@@ -96,8 +96,8 @@ func createTestInspectionServer() (*inspection.InspectionTaskServer, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskDefinitions := []task.UntypedDefinition{
-		task_test.MockTask(inspection_task.BuilderGeneratorTask, history.NewBuilder(&ioconfig.IOConfig{
+	tasks := []task.UntypedTask{
+		task_test.StubTask(inspection_task.BuilderGeneratorTask, history.NewBuilder(&ioconfig.IOConfig{
 			ApplicationRoot: "/",
 			DataDestination: "/tmp/",
 			TemporaryFolder: "/tmp/",
@@ -114,14 +114,14 @@ func createTestInspectionServer() (*inspection.InspectionTaskServer, error) {
 		inspection_task.NewInspectionTask(debugTaskImplID("errorend"), []taskid.UntypedTaskReference{}, func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, progress *progress.TaskProgress) (any, error) {
 			return nil, fmt.Errorf("test error")
 		}, inspection_task.InspectionTypeLabel("foo", "bar", "qux")),
-		form.NewInputFormDefinitionBuilder(debugTaskImplID("foo-input"), 0, "A input field for foo").WithValidator(func(ctx context.Context, value string) (string, error) {
+		form.NewInputFormTaskBuilder(debugTaskImplID("foo-input"), 0, "A input field for foo").WithValidator(func(ctx context.Context, value string) (string, error) {
 			if value == "foo-input-invalid-value" {
 				return "invalid value", nil
 			}
 			return "", nil
 		}).Build(inspection_task.InspectionTypeLabel("foo")),
-		task_test.MockTask(gcp_task.TimeZoneShiftInputTask, time.UTC, nil),
-		form.NewInputFormDefinitionBuilder(taskid.NewDefaultImplementationID[string]("bar-input"), 1, "A input field for bar").Build(inspection_task.InspectionTypeLabel("bar")),
+		task_test.StubTask(gcp_task.TimeZoneShiftInputTask, time.UTC, nil),
+		form.NewInputFormTaskBuilder(taskid.NewDefaultImplementationID[string]("bar-input"), 1, "A input field for bar").Build(inspection_task.InspectionTypeLabel("bar")),
 		inspection_task.NewInspectionTask(debugTaskImplID("feature-foo1"), []taskid.UntypedTaskReference{debugRef("foo-input")}, func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, tp *progress.TaskProgress) (any, error) {
 			return "feature-foo1-value", nil
 		}, inspection_task.InspectionTypeLabel("foo"), inspection_task.FeatureTaskLabel("foo feature1", "test-feature", enum.LogTypeAudit, false)),
@@ -137,8 +137,8 @@ func createTestInspectionServer() (*inspection.InspectionTaskServer, error) {
 		ioconfig.TestIOConfig,
 	}
 
-	for _, def := range taskDefinitions {
-		err = inspectionServer.AddTaskDefinition(def)
+	for _, task := range tasks {
+		err = inspectionServer.AddTask(task)
 		if err != nil {
 			return nil, err
 		}

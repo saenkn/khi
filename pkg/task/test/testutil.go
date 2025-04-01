@@ -50,16 +50,16 @@ func NewTaskDependencyValuePair[T any](key taskid.TaskReference[T], value T) Tas
 }
 
 // RunTask runs a single task.
-func RunTask[T any](baseContext context.Context, task task.Definition[T], taskDependencyValues ...TaskDependencyValues) (T, error) {
+func RunTask[T any](baseContext context.Context, task task.Task[T], taskDependencyValues ...TaskDependencyValues) (T, error) {
 	taskCtx := prepareTaskContext(baseContext, task, taskDependencyValues...)
 	return task.Run(taskCtx)
 }
 
 // RunTaskWithDependency runs a task as a graph. Supply the dependencies of the main task to resolve the graph correctly.
-func RunTaskWithDependency[T any](baseContext context.Context, mainTask task.Definition[T], dependencies []task.UntypedDefinition) (T, error) {
+func RunTaskWithDependency[T any](baseContext context.Context, mainTask task.Task[T], dependencies []task.UntypedTask) (T, error) {
 	taskCtx := prepareTaskContext(baseContext, mainTask)
 
-	taskSet, err := task.NewSet([]task.UntypedDefinition{mainTask})
+	taskSet, err := task.NewSet([]task.UntypedTask{mainTask})
 	if err != nil {
 		return *new(T), err
 	}
@@ -97,7 +97,7 @@ func RunTaskWithDependency[T any](baseContext context.Context, mainTask task.Def
 	return result, nil
 }
 
-func prepareTaskContext(baseContext context.Context, task task.UntypedDefinition, taskDependencyValues ...TaskDependencyValues) context.Context {
+func prepareTaskContext(baseContext context.Context, task task.UntypedTask, taskDependencyValues ...TaskDependencyValues) context.Context {
 	taskCtx := khictx.WithValue(baseContext, task_contextkey.TaskImplementationIDContextKey, task.UntypedID())
 
 	resultMap := typedmap.NewTypedMap()
@@ -110,15 +110,15 @@ func prepareTaskContext(baseContext context.Context, task task.UntypedDefinition
 	return taskCtx
 }
 
-// MockTask wraps a given task to return the constant values given without calling the original task.
-func MockTask[T any](mockTarget task.Definition[T], mockResult T, mockError error) task.Definition[T] {
+// StubTask wraps a given task to return the constant values given without calling the original task.
+func StubTask[T any](mockTarget task.Task[T], mockResult T, mockError error) task.Task[T] {
 	return task.NewTask(mockTarget.ID(), []taskid.UntypedTaskReference{}, func(ctx context.Context) (T, error) {
 		return mockResult, mockError
 	}, task.FromLabels(mockTarget.Labels())...)
 }
 
-// MockTaskFromReferenceID creates a new test task return the given constant value of its result.
-func MockTaskFromReferenceID[T any](mockTargetReference taskid.TaskReference[T], mockResult T, mockError error) task.Definition[T] {
+// StubTaskFromReferenceID creates a new test task return the given constant value of its result.
+func StubTaskFromReferenceID[T any](mockTargetReference taskid.TaskReference[T], mockResult T, mockError error) task.Task[T] {
 	return task.NewTask(taskid.NewDefaultImplementationID[T](mockTargetReference.ReferenceIDString()), []taskid.UntypedTaskReference{}, func(ctx context.Context) (T, error) {
 		return mockResult, mockError
 	})

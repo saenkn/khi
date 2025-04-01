@@ -35,7 +35,7 @@ type PreviousTaskResult[T any] struct {
 }
 
 // NewCachedTask generates a task which can reuse the value last time.
-func NewCachedTask[T any](taskID taskid.TaskImplementationID[T], depdendencies []taskid.UntypedTaskReference, f func(ctx context.Context, prevValue PreviousTaskResult[T]) (PreviousTaskResult[T], error), labelOpt ...task.LabelOpt) task.Definition[T] {
+func NewCachedTask[T any](taskID taskid.TaskImplementationID[T], depdendencies []taskid.UntypedTaskReference, f func(ctx context.Context, prevValue PreviousTaskResult[T]) (PreviousTaskResult[T], error), labelOpt ...task.LabelOpt) task.Task[T] {
 	return task.NewTask(taskID, depdendencies, func(ctx context.Context) (T, error) {
 		inspectionSharedMap := khictx.MustGetValue(ctx, inspection_task_contextkey.GlobalSharedMap)
 		cacheKey := typedmap.NewTypedKey[PreviousTaskResult[T]](fmt.Sprintf("cached_result-%s", taskID.String()))

@@ -61,7 +61,7 @@ type Parser interface {
 	Grouper() grouper.LogGrouper
 }
 
-func NewParserTaskFromParser(taskId taskid.TaskImplementationID[any], parser Parser, isDefaultFeature bool, labelOpts ...task.LabelOpt) task.Definition[any] {
+func NewParserTaskFromParser(taskId taskid.TaskImplementationID[any], parser Parser, isDefaultFeature bool, labelOpts ...task.LabelOpt) task.Task[any] {
 	return inspection_task.NewInspectionTask(taskId, append(parser.Dependencies(), parser.LogTask(), inspection_task.BuilderGeneratorTaskID), func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, tp *progress.TaskProgress) (any, error) {
 		if taskMode == inspection_task_interface.TaskModeDryRun {
 			slog.DebugContext(ctx, "Skipping task because this is dry run mode")

@@ -27,7 +27,7 @@ const priorityForControlPlaneGroup = gcp_task.FormBasePriority + 30000
 
 var inputControlPlaneComponentNameAliasMap map[string][]string = map[string][]string{}
 
-var InputControlPlaneComponentNameFilterTask = form.NewInputFormDefinitionBuilder(
+var InputControlPlaneComponentNameFilterTask = form.NewInputFormTaskBuilder(
 	k8s_control_plane_component_taskid.InputControlPlaneComponentNameFilterTaskID,
 	priorityForControlPlaneGroup+1000,
 	"Control plane component names",

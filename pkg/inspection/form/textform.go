@@ -49,9 +49,9 @@ type TextFormValueConverter[T any] = func(ctx context.Context, value string) (T,
 // TextFormHintGenerator is a function type to generate a hint string
 type TextFormHintGenerator = func(ctx context.Context, value string, convertedValue any) (string, form_metadata.FormFieldHintType, error)
 
-// TextFormDefinitionBuilder is an utility to construct an instance of Definition for input form field.
-// This will generate the Definition instance with `Build()` method call after chaining several configuration methods.
-type TextFormDefinitionBuilder[T any] struct {
+// TextFormTaskBuilder is an utility to construct an instance of Task for input form field.
+// This will generate the Task instance with `Build()` method call after chaining several configuration methods.
+type TextFormTaskBuilder[T any] struct {
 	id                  taskid.TaskImplementationID[T]
 	label               string
 	priority            int
@@ -66,17 +66,17 @@ type TextFormDefinitionBuilder[T any] struct {
 	converter           TextFormValueConverter[T]
 }
 
-// NewInputFormDefinitionBuilder constructs an instace of TextFormDefinitionBuilder.
+// NewInputFormTaskBuilder constructs an instace of TextFormTaskBuilder.
 // id,prioirity and label will be initialized with the value given in the argument. The other values are initialized with the following values.
-// dependencies : Initialized with an empty string array indicating this definition is not depending on anything.
+// dependencies : Initialized with an empty string array indicating this task is not depending on anything.
 // description: Initialized with an empty string.
 // defaultValue: Initialized with a function to return empty string.
 // validator: Initialized with a function to return empty string that indicates the validation is always passing.
 // allowEditProvider: Initialized with a function to return true.
 // suggestionsProvider: Initialized with a function to return nil.
 // converter: Initialized with a function to return the given value. This means no conversion applied and treated as a string.
-func NewInputFormDefinitionBuilder[T any](id taskid.TaskImplementationID[T], priority int, fieldLabel string) *TextFormDefinitionBuilder[T] {
-	return &TextFormDefinitionBuilder[T]{
+func NewInputFormTaskBuilder[T any](id taskid.TaskImplementationID[T], priority int, fieldLabel string) *TextFormTaskBuilder[T] {
+	return &TextFormTaskBuilder[T]{
 		id:           id,
 		priority:     priority,
 		label:        fieldLabel,
@@ -103,32 +103,32 @@ func NewInputFormDefinitionBuilder[T any](id taskid.TaskImplementationID[T], pri
 	}
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithDependencies(dependencies []taskid.UntypedTaskReference) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithDependencies(dependencies []taskid.UntypedTaskReference) *TextFormTaskBuilder[T] {
 	b.dependencies = dependencies
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithUIDescription(uiDescription string) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithUIDescription(uiDescription string) *TextFormTaskBuilder[T] {
 	b.uiDescription = uiDescription
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithDocumentDescription(documentDescription string) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithDocumentDescription(documentDescription string) *TextFormTaskBuilder[T] {
 	b.documentDescription = documentDescription
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithValidator(validator TextFormValidator) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithValidator(validator TextFormValidator) *TextFormTaskBuilder[T] {
 	b.validator = validator
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithDefaultValueFunc(defFunc TextFormDefaultValueGenerator) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithDefaultValueFunc(defFunc TextFormDefaultValueGenerator) *TextFormTaskBuilder[T] {
 	b.defaultValue = defFunc
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithDefaultValueConstant(defValue string, preferPrevValue bool) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithDefaultValueConstant(defValue string, preferPrevValue bool) *TextFormTaskBuilder[T] {
 	return b.WithDefaultValueFunc(func(ctx context.Context, previousValues []string) (string, error) {
 		if preferPrevValue {
 			if len(previousValues) > 0 {
@@ -139,33 +139,33 @@ func (b *TextFormDefinitionBuilder[T]) WithDefaultValueConstant(defValue string,
 	})
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithAllowEditFunc(allowEditFunc TextFormAllowEditProvider) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithAllowEditFunc(allowEditFunc TextFormAllowEditProvider) *TextFormTaskBuilder[T] {
 	b.allowEditProvider = allowEditFunc
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithSuggestionsFunc(suggestionsFunc TextFormSuggestionsProvider) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithSuggestionsFunc(suggestionsFunc TextFormSuggestionsProvider) *TextFormTaskBuilder[T] {
 	b.suggestionsProvider = suggestionsFunc
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithSuggestionsConstant(suggestions []string) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithSuggestionsConstant(suggestions []string) *TextFormTaskBuilder[T] {
 	return b.WithSuggestionsFunc(func(ctx context.Context, value string, previousValues []string) ([]string, error) {
 		return suggestions, nil
 	})
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithHintFunc(hintFunc TextFormHintGenerator) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithHintFunc(hintFunc TextFormHintGenerator) *TextFormTaskBuilder[T] {
 	b.hintGenerator = hintFunc
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) WithConverter(converter TextFormValueConverter[T]) *TextFormDefinitionBuilder[T] {
+func (b *TextFormTaskBuilder[T]) WithConverter(converter TextFormValueConverter[T]) *TextFormTaskBuilder[T] {
 	b.converter = converter
 	return b
 }
 
-func (b *TextFormDefinitionBuilder[T]) Build(labelOpts ...common_task.LabelOpt) common_task.Definition[T] {
+func (b *TextFormTaskBuilder[T]) Build(labelOpts ...common_task.LabelOpt) common_task.Task[T] {
 	return common_task.NewTask(b.id, b.dependencies, func(ctx context.Context) (T, error) {
 		taskMode := khictx.MustGetValue(ctx, inspection_task_contextkey.InspectionTaskMode)
 		m := khictx.MustGetValue(ctx, inspection_task_contextkey.InspectionRunMetadata)

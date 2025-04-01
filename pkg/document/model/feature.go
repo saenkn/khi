@@ -204,8 +204,8 @@ func GetFeatureDocumentModel(taskServer *inspection.InspectionTaskServer) (*Feat
 }
 
 // getDependentQueryTasks returns the list of query tasks required by the feature task.
-func getDependentQueryTasks(taskServer *inspection.InspectionTaskServer, featureTask task.UntypedDefinition) ([]task.UntypedDefinition, error) {
-	resolveSource, err := task.NewSet([]task.UntypedDefinition{featureTask})
+func getDependentQueryTasks(taskServer *inspection.InspectionTaskServer, featureTask task.UntypedTask) ([]task.UntypedTask, error) {
+	resolveSource, err := task.NewSet([]task.UntypedTask{featureTask})
 	if err != nil {
 		return nil, err
 	}
@@ -217,8 +217,8 @@ func getDependentQueryTasks(taskServer *inspection.InspectionTaskServer, feature
 }
 
 // getDependentFormTasks returns the list of form tasks required by the feature task.
-func getDependentFormTasks(taskServer *inspection.InspectionTaskServer, featureTask task.UntypedDefinition) ([]task.UntypedDefinition, error) {
-	resolveSource, err := task.NewSet([]task.UntypedDefinition{featureTask})
+func getDependentFormTasks(taskServer *inspection.InspectionTaskServer, featureTask task.UntypedTask) ([]task.UntypedTask, error) {
+	resolveSource, err := task.NewSet([]task.UntypedTask{featureTask})
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func getDependentFormTasks(taskServer *inspection.InspectionTaskServer, featureT
 }
 
 // getAvailableInspectionTypes returns the list of information about inspection type that supports this feature.
-func getAvailableInspectionTypes(taskServer *inspection.InspectionTaskServer, featureTask task.UntypedDefinition) []FeatureAvailableInspectionType {
+func getAvailableInspectionTypes(taskServer *inspection.InspectionTaskServer, featureTask task.UntypedTask) []FeatureAvailableInspectionType {
 	result := []FeatureAvailableInspectionType{}
 	inspectionTypes := taskServer.GetAllInspectionTypes()
 	for _, inspectionType := range inspectionTypes {

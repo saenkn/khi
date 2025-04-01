@@ -30,12 +30,12 @@ var InspectionTimeTaskID = taskid.NewDefaultImplementationID[time.Time](Inspecti
 
 // InspectionTimeProducer is a provider of inspection time.
 // Tasks shouldn't use time.Now() directly to make test easier.
-var InspectionTimeProducer common_task.Definition[time.Time] = common_task.NewTask(InspectionTimeTaskID, []taskid.UntypedTaskReference{}, func(ctx context.Context) (time.Time, error) {
+var InspectionTimeProducer common_task.Task[time.Time] = common_task.NewTask(InspectionTimeTaskID, []taskid.UntypedTaskReference{}, func(ctx context.Context) (time.Time, error) {
 	return time.Now(), nil
 })
 
 // TestInspectionTimeTaskProducer is a function to generate a fake InspectionTimeProducer task with the given time string.
-var TestInspectionTimeTaskProducer func(timeStr string) common_task.Definition[time.Time] = func(timeStr string) common_task.Definition[time.Time] {
+var TestInspectionTimeTaskProducer func(timeStr string) common_task.Task[time.Time] = func(timeStr string) common_task.Task[time.Time] {
 	return common_task.NewTask(InspectionTimeTaskID, []taskid.UntypedTaskReference{}, func(ctx context.Context) (time.Time, error) {
 		t, err := time.Parse(time.RFC3339, timeStr)
 		if err != nil {

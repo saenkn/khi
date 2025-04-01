@@ -32,22 +32,22 @@ import (
 )
 
 var PrepareK8sAuditTasks inspection.PrepareInspectionServerFunc = func(inspectionServer *inspection.InspectionTaskServer) error {
-	err := inspectionServer.AddTaskDefinition(v2commonlogparse.Task)
+	err := inspectionServer.AddTask(v2commonlogparse.Task)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(v2timelinegrouping.Task)
+	err = inspectionServer.AddTask(v2timelinegrouping.Task)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(v2manifestgenerate.Task)
+	err = inspectionServer.AddTask(v2manifestgenerate.Task)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(v2logconvert.Task)
+	err = inspectionServer.AddTask(v2logconvert.Task)
 	if err != nil {
 		return err
 	}

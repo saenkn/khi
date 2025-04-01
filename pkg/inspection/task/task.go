@@ -29,8 +29,8 @@ import (
 
 type InspectionProcessorFunc[T any] = func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, progress *progress.TaskProgress) (T, error)
 
-// NewInspectionTask generates a processor task.Definition with progress reporting feature
-func NewInspectionTask[T any](taskId taskid.TaskImplementationID[T], dependencies []taskid.UntypedTaskReference, processor InspectionProcessorFunc[T], labelOpts ...task.LabelOpt) task.Definition[T] {
+// NewInspectionTask generates a task with progress reporting feature
+func NewInspectionTask[T any](taskId taskid.TaskImplementationID[T], dependencies []taskid.UntypedTaskReference, processor InspectionProcessorFunc[T], labelOpts ...task.LabelOpt) task.Task[T] {
 	return task.NewTask(taskId, dependencies, func(ctx context.Context) (T, error) {
 		taskMode := khictx.MustGetValue(ctx, inspection_task_contextkey.InspectionTaskMode)
 		metadataSet := khictx.MustGetValue(ctx, inspection_task_contextkey.InspectionRunMetadata)

@@ -49,13 +49,13 @@ import (
 
 var inspectionRunnerGlobalSharedMap = typedmap.NewTypedMap()
 
-type InspectionRunner struct {
+type InspectionTaskRunner struct {
 	inspectionServer      *InspectionTaskServer
 	ID                    string
 	enabledFeatures       map[string]bool
-	availableDefinitions  *task.DefinitionSet
-	featuresDefinitions   *task.DefinitionSet
-	requiredDefinitions   *task.DefinitionSet
+	availableTasks        *task.TaskSet
+	featureTasks          *task.TaskSet
+	requiredTasks         *task.TaskSet
 	runner                task_interface.TaskRunner
 	runnerLock            sync.Mutex
 	metadata              *typedmap.ReadonlyTypedMap
@@ -64,14 +64,14 @@ type InspectionRunner struct {
 	currentInspectionType string
 }
 
-func NewInspectionRunner(server *InspectionTaskServer) *InspectionRunner {
-	return &InspectionRunner{
+func NewInspectionRunner(server *InspectionTaskServer) *InspectionTaskRunner {
+	return &InspectionTaskRunner{
 		inspectionServer:      server,
 		ID:                    generateRandomString(),
 		enabledFeatures:       map[string]bool{},
-		availableDefinitions:  nil,
-		featuresDefinitions:   nil,
-		requiredDefinitions:   nil,
+		availableTasks:        nil,
+		featureTasks:          nil,
+		requiredTasks:         nil,
 		runner:                nil,
 		runnerLock:            sync.Mutex{},
 		metadata:              nil,
@@ -81,11 +81,11 @@ func NewInspectionRunner(server *InspectionTaskServer) *InspectionRunner {
 	}
 }
 
-func (i *InspectionRunner) Started() bool {
+func (i *InspectionTaskRunner) Started() bool {
 	return i.runner != nil
 }
 
-func (i *InspectionRunner) SetInspectionType(inspectionType string) error {
+func (i *InspectionTaskRunner) SetInspectionType(inspectionType string) error {
 	typeFound := false
 	for _, inspection := range i.inspectionServer.inspectionTypes {
 		if inspection.Id == inspectionType {
@@ -96,9 +96,9 @@ func (i *InspectionRunner) SetInspectionType(inspectionType string) error {
 	if !typeFound {
 		return fmt.Errorf("inspection type %s was not found", inspectionType)
 	}
-	i.availableDefinitions = task.Subset(i.inspectionServer.RootTaskSet, filter.NewContainsElementFilter(inspection_task.LabelKeyInspectionTypes, inspectionType, true))
-	defaultFeatures := task.Subset(i.availableDefinitions, filter.NewEnabledFilter(inspection_task.LabelKeyInspectionDefaultFeatureFlag, false))
-	i.requiredDefinitions = task.Subset(i.availableDefinitions, filter.NewEnabledFilter(inspection_task.LabelKeyInspectionRequiredFlag, false))
+	i.availableTasks = task.Subset(i.inspectionServer.RootTaskSet, filter.NewContainsElementFilter(inspection_task.LabelKeyInspectionTypes, inspectionType, true))
+	defaultFeatures := task.Subset(i.availableTasks, filter.NewEnabledFilter(inspection_task.LabelKeyInspectionDefaultFeatureFlag, false))
+	i.requiredTasks = task.Subset(i.availableTasks, filter.NewEnabledFilter(inspection_task.LabelKeyInspectionRequiredFlag, false))
 	defaultFeatureIds := []string{}
 	for _, featureTask := range defaultFeatures.GetAll() {
 		defaultFeatureIds = append(defaultFeatureIds, featureTask.UntypedID().String())
@@ -107,21 +107,21 @@ func (i *InspectionRunner) SetInspectionType(inspectionType string) error {
 	return i.SetFeatureList(defaultFeatureIds)
 }
 
-func (i *InspectionRunner) FeatureList() ([]FeatureListItem, error) {
-	if i.availableDefinitions == nil {
+func (i *InspectionTaskRunner) FeatureList() ([]FeatureListItem, error) {
+	if i.availableTasks == nil {
 		return nil, fmt.Errorf("inspection type is not yet initialized")
 	}
-	featureSet := task.Subset(i.availableDefinitions, filter.NewEnabledFilter(inspection_task.LabelKeyInspectionFeatureFlag, false))
+	featureSet := task.Subset(i.availableTasks, filter.NewEnabledFilter(inspection_task.LabelKeyInspectionFeatureFlag, false))
 	features := []FeatureListItem{}
-	for _, definition := range featureSet.GetAll() {
-		label := typedmap.GetOrDefault(definition.Labels(), inspection_task.LabelKeyFeatureTaskTitle, fmt.Sprintf("No label Set!(%s)", definition.UntypedID()))
-		description := typedmap.GetOrDefault(definition.Labels(), inspection_task.LabelKeyFeatureTaskDescription, "")
+	for _, featureTask := range featureSet.GetAll() {
+		label := typedmap.GetOrDefault(featureTask.Labels(), inspection_task.LabelKeyFeatureTaskTitle, fmt.Sprintf("No label Set!(%s)", featureTask.UntypedID()))
+		description := typedmap.GetOrDefault(featureTask.Labels(), inspection_task.LabelKeyFeatureTaskDescription, "")
 		enabled := false
-		if v, exist := i.enabledFeatures[definition.UntypedID().String()]; exist && v {
+		if v, exist := i.enabledFeatures[featureTask.UntypedID().String()]; exist && v {
 			enabled = true
 		}
 		features = append(features, FeatureListItem{
-			Id:          definition.UntypedID().String(),
+			Id:          featureTask.UntypedID().String(),
 			Label:       label,
 			Description: description,
 			Enabled:     enabled,
@@ -130,19 +130,19 @@ func (i *InspectionRunner) FeatureList() ([]FeatureListItem, error) {
 	return features, nil
 }
 
-func (i *InspectionRunner) SetFeatureList(featureList []string) error {
-	featureDefinitions := []task.UntypedDefinition{}
+func (i *InspectionTaskRunner) SetFeatureList(featureList []string) error {
+	featureTasks := []task.UntypedTask{}
 	for _, featureId := range featureList {
-		definition, err := i.availableDefinitions.Get(featureId)
+		featureTask, err := i.availableTasks.Get(featureId)
 		if err != nil {
 			return err
 		}
-		if !typedmap.GetOrDefault(definition.Labels(), inspection_task.LabelKeyInspectionFeatureFlag, false) {
-			return fmt.Errorf("task `%s` is not marked as a feature but requested to be included in the feature set of an inspection", definition.UntypedID())
+		if !typedmap.GetOrDefault(featureTask.Labels(), inspection_task.LabelKeyInspectionFeatureFlag, false) {
+			return fmt.Errorf("task `%s` is not marked as a feature but requested to be included in the feature set of an inspection", featureTask.UntypedID())
 		}
-		featureDefinitions = append(featureDefinitions, definition)
+		featureTasks = append(featureTasks, featureTask)
 	}
-	featureDefinitionSet, err := task.NewSet(featureDefinitions)
+	featureTaskSet, err := task.NewSet(featureTasks)
 	if err != nil {
 		return err
 	}
@@ -150,12 +150,12 @@ func (i *InspectionRunner) SetFeatureList(featureList []string) error {
 	for _, feature := range featureList {
 		i.enabledFeatures[feature] = true
 	}
-	i.featuresDefinitions = featureDefinitionSet
+	i.featureTasks = featureTaskSet
 	return nil
 }
 
 // withRunContextValues returns a context with the value specific to a single run of task.
-func (i *InspectionRunner) withRunContextValues(ctx context.Context, runMode inspection_task_interface.InspectionTaskMode, taskInput map[string]any) context.Context {
+func (i *InspectionTaskRunner) withRunContextValues(ctx context.Context, runMode inspection_task_interface.InspectionTaskMode, taskInput map[string]any) context.Context {
 	rid := generateRandomString()
 	runCtx := khictx.WithValue(ctx, inspection_task_contextkey.InspectionTaskRunID, rid)
 	runCtx = khictx.WithValue(runCtx, inspection_task_contextkey.InspectionTaskInspectionID, i.ID)
@@ -165,7 +165,7 @@ func (i *InspectionRunner) withRunContextValues(ctx context.Context, runMode ins
 	return khictx.WithValue(runCtx, inspection_task_contextkey.InspectionTaskMode, runMode)
 }
 
-func (i *InspectionRunner) Run(ctx context.Context, req *inspection_task.InspectionRequest) error {
+func (i *InspectionTaskRunner) Run(ctx context.Context, req *inspection_task.InspectionRequest) error {
 	defer i.runnerLock.Unlock()
 	i.runnerLock.Lock()
 	if i.runner != nil {
@@ -242,7 +242,7 @@ func (i *InspectionRunner) Run(ctx context.Context, req *inspection_task.Inspect
 	return nil
 }
 
-func (i *InspectionRunner) Result() (*InspectionRunResult, error) {
+func (i *InspectionTaskRunner) Result() (*InspectionRunResult, error) {
 	if i.runner == nil {
 		return nil, fmt.Errorf("this task is not yet started")
 	}
@@ -267,7 +267,7 @@ func (i *InspectionRunner) Result() (*InspectionRunResult, error) {
 	}, nil
 }
 
-func (i *InspectionRunner) Metadata() (map[string]any, error) {
+func (i *InspectionTaskRunner) Metadata() (map[string]any, error) {
 	if i.runner == nil {
 		return nil, fmt.Errorf("this task is not yet started")
 	}
@@ -278,7 +278,7 @@ func (i *InspectionRunner) Metadata() (map[string]any, error) {
 	return md, nil
 }
 
-func (i *InspectionRunner) DryRun(ctx context.Context, req *inspection_task.InspectionRequest) (*InspectionDryRunResult, error) {
+func (i *InspectionTaskRunner) DryRun(ctx context.Context, req *inspection_task.InspectionRequest) (*InspectionDryRunResult, error) {
 	runnableTaskGraph, err := i.resolveTaskGraph()
 	if err != nil {
 		slog.ErrorContext(ctx, err.Error())
@@ -315,22 +315,22 @@ func (i *InspectionRunner) DryRun(ctx context.Context, req *inspection_task.Insp
 	}, nil
 }
 
-func (i *InspectionRunner) MakeLoggers(ctx context.Context, minLevel slog.Level, m *typedmap.ReadonlyTypedMap, definitions []task.UntypedDefinition) *logger.Logger {
+func (i *InspectionTaskRunner) MakeLoggers(ctx context.Context, minLevel slog.Level, m *typedmap.ReadonlyTypedMap, tasks []task.UntypedTask) *logger.Logger {
 	logger := logger.NewLogger()
-	for _, def := range definitions {
+	for _, def := range tasks {
 		taskCtx := khictx.WithValue(ctx, task_contextkey.TaskImplementationIDContextKey, def.UntypedID())
 		logger.MakeTaskLogger(taskCtx, minLevel)
 	}
 	return logger
 }
-func (i *InspectionRunner) GetCurrentMetadata() (*typedmap.ReadonlyTypedMap, error) {
+func (i *InspectionTaskRunner) GetCurrentMetadata() (*typedmap.ReadonlyTypedMap, error) {
 	if i.metadata == nil {
 		return nil, fmt.Errorf("this task hasn't been started")
 	}
 	return i.metadata, nil
 }
 
-func (i *InspectionRunner) Cancel() error {
+func (i *InspectionTaskRunner) Cancel() error {
 	if i.cancel == nil {
 		return fmt.Errorf("this task is not yet started")
 	}
@@ -341,22 +341,22 @@ func (i *InspectionRunner) Cancel() error {
 	return nil
 }
 
-func (i *InspectionRunner) Wait() <-chan interface{} {
+func (i *InspectionTaskRunner) Wait() <-chan interface{} {
 	return i.runner.Wait()
 }
 
-func (i *InspectionRunner) resolveTaskGraph() (*task.DefinitionSet, error) {
-	if i.featuresDefinitions == nil || i.availableDefinitions == nil {
+func (i *InspectionTaskRunner) resolveTaskGraph() (*task.TaskSet, error) {
+	if i.featureTasks == nil || i.availableTasks == nil {
 		return nil, fmt.Errorf("this runner is not ready for resolving graph")
 	}
-	usedTaskDefinitions := []task.UntypedDefinition{}
-	usedTaskDefinitions = append(usedTaskDefinitions, i.featuresDefinitions.GetAll()...)
-	usedTaskDefinitions = append(usedTaskDefinitions, i.requiredDefinitions.GetAll()...)
-	initialTaskSet, err := task.NewSet(usedTaskDefinitions)
+	usedTasks := []task.UntypedTask{}
+	usedTasks = append(usedTasks, i.featureTasks.GetAll()...)
+	usedTasks = append(usedTasks, i.requiredTasks.GetAll()...)
+	initialTaskSet, err := task.NewSet(usedTasks)
 	if err != nil {
 		return nil, err
 	}
-	set, err := initialTaskSet.ResolveTask(i.availableDefinitions)
+	set, err := initialTaskSet.ResolveTask(i.availableTasks)
 	if err != nil {
 		return nil, err
 	}
@@ -372,22 +372,22 @@ func (i *InspectionRunner) resolveTaskGraph() (*task.DefinitionSet, error) {
 		return nil, err
 	}
 
-	return wrapped.ResolveTask(i.availableDefinitions)
+	return wrapped.ResolveTask(i.availableTasks)
 }
 
-func (i *InspectionRunner) generateMetadataForDryRun(ctx context.Context, initHeader *header.Header, taskGraph *task.DefinitionSet) *typedmap.ReadonlyTypedMap {
+func (i *InspectionTaskRunner) generateMetadataForDryRun(ctx context.Context, initHeader *header.Header, taskGraph *task.TaskSet) *typedmap.ReadonlyTypedMap {
 	writableMetadata := typedmap.NewTypedMap()
 	i.addCommonMetadata(ctx, writableMetadata, initHeader, taskGraph)
 	return writableMetadata.AsReadonly()
 }
 
-func (i *InspectionRunner) generateMetadataForRun(ctx context.Context, initHeader *header.Header, taskGraph *task.DefinitionSet) *typedmap.ReadonlyTypedMap {
+func (i *InspectionTaskRunner) generateMetadataForRun(ctx context.Context, initHeader *header.Header, taskGraph *task.TaskSet) *typedmap.ReadonlyTypedMap {
 	writableMetadata := typedmap.NewTypedMap()
 	i.addCommonMetadata(ctx, writableMetadata, initHeader, taskGraph)
 	return writableMetadata.AsReadonly()
 }
 
-func (i *InspectionRunner) addCommonMetadata(ctx context.Context, writableMetadata *typedmap.TypedMap, initHeader *header.Header, taskGraph *task.DefinitionSet) {
+func (i *InspectionTaskRunner) addCommonMetadata(ctx context.Context, writableMetadata *typedmap.TypedMap, initHeader *header.Header, taskGraph *task.TaskSet) {
 	typedmap.Set(writableMetadata, header.HeaderMetadataKey, initHeader)
 	typedmap.Set(writableMetadata, error_metadata.ErrorMessageSetMetadataKey, error_metadata.NewErrorMessageSet())
 	typedmap.Set(writableMetadata, form.FormFieldSetMetadataKey, form.NewFormFieldSet())

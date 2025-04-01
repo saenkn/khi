@@ -21,22 +21,22 @@ import (
 )
 
 func PrepareInspectionServer(rootServer *inspection.InspectionTaskServer) error {
-	err := rootServer.AddTaskDefinition(task.InspectionTimeProducer)
+	err := rootServer.AddTask(task.InspectionTimeProducer)
 	if err != nil {
 		return err
 	}
 
-	err = rootServer.AddTaskDefinition(ioconfig.ProductionIOConfig)
+	err = rootServer.AddTask(ioconfig.ProductionIOConfig)
 	if err != nil {
 		return err
 	}
 
-	err = rootServer.AddTaskDefinition(task.BuilderGeneratorTask)
+	err = rootServer.AddTask(task.BuilderGeneratorTask)
 	if err != nil {
 		return err
 	}
 
-	err = rootServer.AddTaskDefinition(task.ReaderFactoryGeneratorTask)
+	err = rootServer.AddTask(task.ReaderFactoryGeneratorTask)
 	if err != nil {
 		return err
 	}

@@ -190,10 +190,10 @@ timestamp: 2024-01-01T00:00:00+09:00`,
 			}
 
 			ctx := inspection_task_test.WithDefaultTestInspectionTaskContext(context.Background())
-			result, _, err := inspection_task_test.RunInspectionTaskWithDependency(ctx, Task, []base_task.UntypedDefinition{
+			result, _, err := inspection_task_test.RunInspectionTaskWithDependency(ctx, Task, []base_task.UntypedTask{
 				v2timelinegrouping.Task,
 				v2commonlogparse.Task,
-				task_test.MockTaskFromReferenceID(k8saudittask.K8sAuditQueryTaskID.GetTaskReference(), logs, nil),
+				task_test.StubTaskFromReferenceID(k8saudittask.K8sAuditQueryTaskID.GetTaskReference(), logs, nil),
 				gcp_task.GCPDefaultK8sResourceMergeConfigTask,
 				task.ReaderFactoryGeneratorTask,
 			}, inspection_task_interface.TaskModeRun, map[string]any{})

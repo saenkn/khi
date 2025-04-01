@@ -42,138 +42,138 @@ import (
 )
 
 func commonPreparation(inspectionServer *inspection.InspectionTaskServer) error {
-	err := inspectionServer.AddTaskDefinition(task.GCPDefaultK8sResourceMergeConfigTask)
+	err := inspectionServer.AddTask(task.GCPDefaultK8sResourceMergeConfigTask)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(gke.AutocompleteClusterNames)
+	err = inspectionServer.AddTask(gke.AutocompleteClusterNames)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(aws.AutocompleteClusterNames)
+	err = inspectionServer.AddTask(aws.AutocompleteClusterNames)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(azure.AutocompleteClusterNames)
+	err = inspectionServer.AddTask(azure.AutocompleteClusterNames)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(baremetal.AutocompleteClusterNames)
+	err = inspectionServer.AddTask(baremetal.AutocompleteClusterNames)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(vmware.AutocompleteClusterNames)
+	err = inspectionServer.AddTask(vmware.AutocompleteClusterNames)
 	if err != nil {
 		return err
 	}
 
 	// Form input related tasks
-	err = inspectionServer.AddTaskDefinition(task.TimeZoneShiftInputTask)
+	err = inspectionServer.AddTask(task.TimeZoneShiftInputTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputProjectIdTask)
+	err = inspectionServer.AddTask(task.InputProjectIdTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputClusterNameTask)
+	err = inspectionServer.AddTask(task.InputClusterNameTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputDurationTask)
+	err = inspectionServer.AddTask(task.InputDurationTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputEndTimeTask)
+	err = inspectionServer.AddTask(task.InputEndTimeTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputStartTimeTask)
+	err = inspectionServer.AddTask(task.InputStartTimeTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputKindFilterTask)
+	err = inspectionServer.AddTask(task.InputKindFilterTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputLocationsTask)
+	err = inspectionServer.AddTask(task.InputLocationsTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputNamespaceFilterTask)
+	err = inspectionServer.AddTask(task.InputNamespaceFilterTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(task.InputNodeNameFilterTask)
-	if err != nil {
-		return err
-	}
-
-	err = inspectionServer.AddTaskDefinition(k8s_container.InputContainerQueryNamespaceFilterTask)
-	if err != nil {
-		return err
-	}
-	err = inspectionServer.AddTaskDefinition(k8s_container.InputContainerQueryPodNamesFilterMask)
+	err = inspectionServer.AddTask(task.InputNodeNameFilterTask)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(k8scontrolplanecomponent.InputControlPlaneComponentNameFilterTask)
+	err = inspectionServer.AddTask(k8s_container.InputContainerQueryNamespaceFilterTask)
+	if err != nil {
+		return err
+	}
+	err = inspectionServer.AddTask(k8s_container.InputContainerQueryPodNamesFilterMask)
+	if err != nil {
+		return err
+	}
+
+	err = inspectionServer.AddTask(k8scontrolplanecomponent.InputControlPlaneComponentNameFilterTask)
 	if err != nil {
 		return err
 	}
 
 	// Query related tasks
-	err = inspectionServer.AddTaskDefinition(k8sauditquery.Task)
+	err = inspectionServer.AddTask(k8sauditquery.Task)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(k8s_event.GKEK8sEventLogQueryTask)
+	err = inspectionServer.AddTask(k8s_event.GKEK8sEventLogQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(k8s_node.GKENodeQueryTask)
+	err = inspectionServer.AddTask(k8s_node.GKENodeQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(k8s_container.GKEContainerQueryTask)
+	err = inspectionServer.AddTask(k8s_container.GKEContainerQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(gke_audit.GKEAuditQueryTask)
+	err = inspectionServer.AddTask(gke_audit.GKEAuditQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(compute_api.ComputeAPIQueryTask)
+	err = inspectionServer.AddTask(compute_api.ComputeAPIQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(network_api.GCPNetworkLogQueryTask)
+	err = inspectionServer.AddTask(network_api.GCPNetworkLogQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(multicloud_api.MultiCloudAPIQueryTask)
+	err = inspectionServer.AddTask(multicloud_api.MultiCloudAPIQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(autoscaler.AutoscalerQueryTask)
+	err = inspectionServer.AddTask(autoscaler.AutoscalerQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(onprem_api.OnPremAPIQueryTask)
+	err = inspectionServer.AddTask(onprem_api.OnPremAPIQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(k8scontrolplanecomponent.GKEK8sControlPlaneLogQueryTask)
+	err = inspectionServer.AddTask(k8scontrolplanecomponent.GKEK8sControlPlaneLogQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(serialport.GKESerialPortLogQueryTask)
+	err = inspectionServer.AddTask(serialport.GKESerialPortLogQueryTask)
 	if err != nil {
 		return err
 	}
@@ -183,69 +183,69 @@ func commonPreparation(inspectionServer *inspection.InspectionTaskServer) error 
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(k8s_event.GKEK8sEventLogParseJob)
+	err = inspectionServer.AddTask(k8s_event.GKEK8sEventLogParseJob)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(k8s_node.GKENodeLogParseJob)
+	err = inspectionServer.AddTask(k8s_node.GKENodeLogParseJob)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(k8s_container.GKEContainerLogParseJob)
+	err = inspectionServer.AddTask(k8s_container.GKEContainerLogParseJob)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(gke_audit.GKEAuditLogParseJob)
+	err = inspectionServer.AddTask(gke_audit.GKEAuditLogParseJob)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(compute_api.ComputeAPIParserTask)
+	err = inspectionServer.AddTask(compute_api.ComputeAPIParserTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(network_api.NetowrkAPIParserTask)
+	err = inspectionServer.AddTask(network_api.NetowrkAPIParserTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(multicloud_api.MultiCloudAuditLogParseJob)
+	err = inspectionServer.AddTask(multicloud_api.MultiCloudAuditLogParseJob)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(autoscaler.AutoscalerParserTask)
+	err = inspectionServer.AddTask(autoscaler.AutoscalerParserTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(onprem_api.OnPremCloudAuditLogParseTask)
+	err = inspectionServer.AddTask(onprem_api.OnPremCloudAuditLogParseTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(k8scontrolplanecomponent.GKEK8sControlPlaneComponentLogParseTask)
+	err = inspectionServer.AddTask(k8scontrolplanecomponent.GKEK8sControlPlaneComponentLogParseTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(serialport.GKESerialPortLogParseTask)
+	err = inspectionServer.AddTask(serialport.GKESerialPortLogParseTask)
 	if err != nil {
 		return err
 	}
 
 	// Cluster name prefix tasks
-	err = inspectionServer.AddTaskDefinition(gke.GKEClusterNamePrefixTask)
+	err = inspectionServer.AddTask(gke.GKEClusterNamePrefixTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(aws.AnthosOnAWSClusterNamePrefixTask)
+	err = inspectionServer.AddTask(aws.AnthosOnAWSClusterNamePrefixTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(azure.AnthosOnAzureClusterNamePrefixTask)
+	err = inspectionServer.AddTask(azure.AnthosOnAzureClusterNamePrefixTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(vmware.AnthosOnVMWareClusterNamePrefixTask)
+	err = inspectionServer.AddTask(vmware.AnthosOnVMWareClusterNamePrefixTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(baremetal.AnthosOnBaremetalClusterNamePrefixTask)
+	err = inspectionServer.AddTask(baremetal.AnthosOnBaremetalClusterNamePrefixTask)
 	if err != nil {
 		return err
 	}
@@ -277,55 +277,55 @@ func commonPreparation(inspectionServer *inspection.InspectionTaskServer) error 
 	}
 
 	// Composer Query Task
-	err = inspectionServer.AddTaskDefinition(composer_query.ComposerMonitoringLogQueryTask)
+	err = inspectionServer.AddTask(composer_query.ComposerMonitoringLogQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(composer_query.ComposerDagProcessorManagerLogQueryTask)
+	err = inspectionServer.AddTask(composer_query.ComposerDagProcessorManagerLogQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(composer_query.ComposerSchedulerLogQueryTask)
+	err = inspectionServer.AddTask(composer_query.ComposerSchedulerLogQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(composer_query.ComposerWorkerLogQueryTask)
+	err = inspectionServer.AddTask(composer_query.ComposerWorkerLogQueryTask)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(composer_form.AutocompleteClusterNames)
+	err = inspectionServer.AddTask(composer_form.AutocompleteClusterNames)
 	if err != nil {
 		return err
 	}
-	err = inspectionServer.AddTaskDefinition(composer_task.ComposerClusterNamePrefixTask)
+	err = inspectionServer.AddTask(composer_task.ComposerClusterNamePrefixTask)
 	if err != nil {
 		return err
 	}
 
 	// Composer Input Task
-	err = inspectionServer.AddTaskDefinition(composer_form.InputComposerEnvironmentNameTask)
+	err = inspectionServer.AddTask(composer_form.InputComposerEnvironmentNameTask)
 	if err != nil {
 		return err
 	}
 
 	// Composer AutoComplete Task
-	err = inspectionServer.AddTaskDefinition(composer_form.AutocompleteComposerEnvironmentNames)
+	err = inspectionServer.AddTask(composer_form.AutocompleteComposerEnvironmentNames)
 	if err != nil {
 		return err
 	}
 
 	// Composer Parser Task
-	err = inspectionServer.AddTaskDefinition(composer_task.AirflowSchedulerLogParseJob)
+	err = inspectionServer.AddTask(composer_task.AirflowSchedulerLogParseJob)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(composer_task.AirflowWorkerLogParseJob)
+	err = inspectionServer.AddTask(composer_task.AirflowWorkerLogParseJob)
 	if err != nil {
 		return err
 	}
 
-	err = inspectionServer.AddTaskDefinition(composer_task.AirflowDagProcessorLogParseJob)
+	err = inspectionServer.AddTask(composer_task.AirflowDagProcessorLogParseJob)
 	if err != nil {
 		return err
 	}

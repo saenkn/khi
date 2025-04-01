@@ -19,13 +19,13 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/common/typedmap"
 )
 
-// Subset returns a new DefinitionSet filtered using the provided type-safe filter
-func Subset[T any](definitionSet *DefinitionSet, mapFilter filter.TypedMapFilter[T]) *DefinitionSet {
-	getMap := func(d UntypedDefinition) *typedmap.ReadonlyTypedMap {
+// Subset returns a new TaskSet filtered using the provided type-safe filter
+func Subset[T any](taskSet *TaskSet, mapFilter filter.TypedMapFilter[T]) *TaskSet {
+	getMap := func(d UntypedTask) *typedmap.ReadonlyTypedMap {
 		return d.Labels()
 	}
 
-	filteredTasks := filter.FilterTypedMapCollection(definitionSet.GetAll(), getMap, mapFilter)
+	filteredTasks := filter.FilterTypedMapCollection(taskSet.GetAll(), getMap, mapFilter)
 	result, _ := NewSet(filteredTasks)
 	return result
 }

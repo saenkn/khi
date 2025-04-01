@@ -33,13 +33,13 @@ type TextFormTestCase struct {
 	Input             string
 	ExpectedValue     any
 	ExpectedFormField form.FormField
-	Dependencies      []task.UntypedDefinition
+	Dependencies      []task.UntypedTask
 	Before            func()
 	After             func()
 }
 
 // TestTextForms tests an inspection task generating a TextForm in the metadata.
-func TestTextForms[T any](t *testing.T, label string, formTask task.Definition[T], testCases []*TextFormTestCase, cmpOptions ...cmp.Option) {
+func TestTextForms[T any](t *testing.T, label string, formTask task.Task[T], testCases []*TextFormTestCase, cmpOptions ...cmp.Option) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			if testCase.Before != nil {

@@ -53,7 +53,7 @@ func (i *ProgressReportableTaskLabelOptImpl) Write(label *typedmap.TypedMap) {
 var _ common_task.LabelOpt = (*ProgressReportableTaskLabelOptImpl)(nil)
 
 // FeatureTaskLabelImpl is an implementation of task.LabelOpt.
-// This annotate a task definition to be a feature in inspection.
+// This annotate a task to be a feature in inspection.
 type FeatureTaskLabelImpl struct {
 	title            string
 	description      string

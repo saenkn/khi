@@ -77,8 +77,8 @@ func GetFormDocumentModel(taskServer *inspection.InspectionTaskServer) (*FormDoc
 }
 
 // getFeaturesRequestingFormTask returns the list of feature tasks that depends on the given form task.
-func getFeaturesRequestingFormTask(taskServer *inspection.InspectionTaskServer, formTask task.UntypedDefinition) ([]task.UntypedDefinition, error) {
-	var result []task.UntypedDefinition
+func getFeaturesRequestingFormTask(taskServer *inspection.InspectionTaskServer, formTask task.UntypedTask) ([]task.UntypedTask, error) {
+	var result []task.UntypedTask
 	features := task.Subset(taskServer.RootTaskSet, filter.NewEnabledFilter(inspection_task.LabelKeyInspectionFeatureFlag, false))
 	for _, feature := range features.GetAll() {
 		hasDependency, err := task.HasDependency(taskServer.RootTaskSet, feature, formTask)

@@ -31,9 +31,9 @@ import (
 	_ "github.com/GoogleCloudPlatform/khi/internal/testflags"
 )
 
-type testFormConfigurator = func(builder *TextFormDefinitionBuilder[string])
+type testFormConfigurator = func(builder *TextFormTaskBuilder[string])
 
-func TestTextFormDefinitionBuilder(t *testing.T) {
+func TestTextFormTaskBuilder(t *testing.T) {
 	testCases := []struct {
 		Name              string
 		FormConfigurator  testFormConfigurator
@@ -44,7 +44,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 	}{
 		{
 			Name:             "A text form with given parameter",
-			FormConfigurator: func(builder *TextFormDefinitionBuilder[string]) {},
+			FormConfigurator: func(builder *TextFormTaskBuilder[string]) {},
 			RequestValue:     "bar",
 			ExpectedValue:    "bar",
 			ExpectedError:    "",
@@ -55,7 +55,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 		},
 		{
 			Name: "A text form with default parameter",
-			FormConfigurator: func(builder *TextFormDefinitionBuilder[string]) {
+			FormConfigurator: func(builder *TextFormTaskBuilder[string]) {
 				builder.WithDefaultValueConstant("foo-default", true)
 			},
 			RequestValue:  "",
@@ -69,7 +69,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 		},
 		{
 			Name: "A text form with validator",
-			FormConfigurator: func(builder *TextFormDefinitionBuilder[string]) {
+			FormConfigurator: func(builder *TextFormTaskBuilder[string]) {
 				builder.WithValidator(func(ctx context.Context, value string) (string, error) {
 					return "foo validation error", nil
 				})
@@ -85,7 +85,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 		},
 		{
 			Name: "A text form with allow edit hand",
-			FormConfigurator: func(builder *TextFormDefinitionBuilder[string]) {
+			FormConfigurator: func(builder *TextFormTaskBuilder[string]) {
 				builder.WithAllowEditFunc(func(ctx context.Context) (bool, error) {
 					return false, nil
 				})
@@ -100,7 +100,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 		},
 		{
 			Name: "A text form with non allow edit hand but with parameter",
-			FormConfigurator: func(builder *TextFormDefinitionBuilder[string]) {
+			FormConfigurator: func(builder *TextFormTaskBuilder[string]) {
 				builder.WithAllowEditFunc(func(ctx context.Context) (bool, error) {
 					return false, nil
 				}).WithDefaultValueConstant("foo-from-default", true)
@@ -116,7 +116,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 		},
 		{
 			Name: "A text form with hint",
-			FormConfigurator: func(builder *TextFormDefinitionBuilder[string]) {
+			FormConfigurator: func(builder *TextFormTaskBuilder[string]) {
 				builder.WithHintFunc(func(ctx context.Context, value string, convertedValue any) (string, form_metadata.FormFieldHintType, error) {
 					return "foo-hint", form_metadata.HintTypeInfo, nil
 				})
@@ -132,7 +132,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 		},
 		{
 			Name: "A text form with allow edit but with parameter",
-			FormConfigurator: func(builder *TextFormDefinitionBuilder[string]) {
+			FormConfigurator: func(builder *TextFormTaskBuilder[string]) {
 				builder.WithAllowEditFunc(func(ctx context.Context) (bool, error) {
 					return true, nil
 				}).WithDefaultValueConstant("foo-from-default", true)
@@ -148,7 +148,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 		},
 		{
 			Name: "A text form with suggestions",
-			FormConfigurator: func(builder *TextFormDefinitionBuilder[string]) {
+			FormConfigurator: func(builder *TextFormTaskBuilder[string]) {
 				builder.WithSuggestionsConstant([]string{
 					"foo-suggest1",
 					"foo-suggest2",
@@ -172,7 +172,7 @@ func TestTextFormDefinitionBuilder(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			originalBuilder := NewInputFormDefinitionBuilder(taskid.NewDefaultImplementationID[string]("foo"), 1, "foo label")
+			originalBuilder := NewInputFormTaskBuilder(taskid.NewDefaultImplementationID[string]("foo"), 1, "foo label")
 			testCase.FormConfigurator(originalBuilder)
 			taskDef := originalBuilder.Build()
 			formFields := []form_metadata.FormField{}

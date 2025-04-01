@@ -15,8 +15,8 @@
 package task
 
 // HasDependency check if 2 tasks have dependency between them when the task graph was resolved with given task set.
-func HasDependency(taskSet *DefinitionSet, dependencyFrom UntypedDefinition, dependencyTo UntypedDefinition) (bool, error) {
-	sourceSet, err := NewSet([]UntypedDefinition{dependencyFrom})
+func HasDependency(taskSet *TaskSet, dependencyFrom UntypedTask, dependencyTo UntypedTask) (bool, error) {
+	sourceSet, err := NewSet([]UntypedTask{dependencyFrom})
 	if err != nil {
 		return false, err
 	}
@@ -24,9 +24,9 @@ func HasDependency(taskSet *DefinitionSet, dependencyFrom UntypedDefinition, dep
 	if err != nil {
 		return false, err
 	}
-	dependentDefinitions := resolvedSet.GetAll()
-	for _, definition := range dependentDefinitions {
-		if definition.UntypedID().String() == dependencyTo.UntypedID().String() {
+	dependentTasks := resolvedSet.GetAll()
+	for _, task := range dependentTasks {
+		if task.UntypedID().String() == dependencyTo.UntypedID().String() {
 			return true, nil
 		}
 	}

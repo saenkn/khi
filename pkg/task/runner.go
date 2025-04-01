@@ -32,14 +32,14 @@ import (
 var _ task_interface.TaskRunner = (*LocalRunner)(nil)
 
 type LocalRunner struct {
-	resolvedDefinitionSet *DefinitionSet
-	resultVariable        *typedmap.TypedMap
-	resultError           error
-	started               bool
-	stopped               bool
-	taskWaiters           *sync.Map // sync.Map[string(taskRefID), sync.RWMutex], runner acquire the write lock at the beginning. All dependents will acquire read lock, it will be released when the task run finished.
-	waiter                chan interface{}
-	taskStatuses          []*LocalRunnerTaskStat
+	resolvedTaskSet *TaskSet
+	resultVariable  *typedmap.TypedMap
+	resultError     error
+	started         bool
+	stopped         bool
+	taskWaiters     *sync.Map // sync.Map[string(taskRefID), sync.RWMutex], runner acquire the write lock at the beginning. All dependents will acquire read lock, it will be released when the task run finished.
+	waiter          chan interface{}
+	taskStatuses    []*LocalRunnerTaskStat
 }
 
 type LocalRunnerTaskStat struct {
@@ -82,10 +82,10 @@ func (r *LocalRunner) Run(ctx context.Context) error {
 		r.resultVariable = typedmap.NewTypedMap()
 		ctx = khictx.WithValue(ctx, task_contextkey.TaskResultMapContextKey, r.resultVariable)
 
-		definitions := r.resolvedDefinitionSet.GetAll()
+		tasks := r.resolvedTaskSet.GetAll()
 		cancelableCtx, cancel := context.WithCancel(ctx)
 		currentErrGrp, currentErrCtx := errgroup.WithContext(cancelableCtx)
-		for i := range definitions {
+		for i := range tasks {
 			taskDefIndex := i
 			currentErrGrp.Go(func() error {
 				err := r.runTask(currentErrCtx, taskDefIndex)
@@ -106,11 +106,11 @@ func (r *LocalRunner) Run(ctx context.Context) error {
 }
 
 func (r *LocalRunner) runTask(graphCtx context.Context, taskDefIndex int) error {
-	definition := r.resolvedDefinitionSet.GetAll()[taskDefIndex]
-	sources := definition.Dependencies()
+	task := r.resolvedTaskSet.GetAll()[taskDefIndex]
+	sources := task.Dependencies()
 	taskStatus := r.taskStatuses[taskDefIndex]
-	taskCtx := khictx.WithValue(graphCtx, task_contextkey.TaskImplementationIDContextKey, definition.UntypedID())
-	slog.DebugContext(taskCtx, fmt.Sprintf("task %s started", definition.UntypedID().String()))
+	taskCtx := khictx.WithValue(graphCtx, task_contextkey.TaskImplementationIDContextKey, task.UntypedID())
+	slog.DebugContext(taskCtx, fmt.Sprintf("task %s started", task.UntypedID().String()))
 	r.waitDependencies(taskCtx, sources)
 	if taskCtx.Err() == context.Canceled {
 		return context.Canceled
@@ -118,25 +118,25 @@ func (r *LocalRunner) runTask(graphCtx context.Context, taskDefIndex int) error 
 
 	taskStatus.StartTime = time.Now()
 	taskStatus.Phase = LocalRunnerTaskStatPhaseRunning
-	slog.DebugContext(taskCtx, fmt.Sprintf("task %s started", definition.UntypedID()))
+	slog.DebugContext(taskCtx, fmt.Sprintf("task %s started", task.UntypedID()))
 
-	result, err := definition.UntypedRun(taskCtx)
+	result, err := task.UntypedRun(taskCtx)
 
 	taskStatus.Phase = LocalRunnerTaskStatPhaseStopped
 	taskStatus.EndTime = time.Now()
-	slog.DebugContext(taskCtx, fmt.Sprintf("task %s stopped after %f sec", definition.UntypedID(), taskStatus.EndTime.Sub(taskStatus.StartTime).Seconds()))
+	slog.DebugContext(taskCtx, fmt.Sprintf("task %s stopped after %f sec", task.UntypedID(), taskStatus.EndTime.Sub(taskStatus.StartTime).Seconds()))
 	taskStatus.Error = err
 	if taskCtx.Err() == context.Canceled {
 		return context.Canceled
 	}
 	if err != nil {
-		detailedErr := r.wrapWithTaskError(err, definition)
+		detailedErr := r.wrapWithTaskError(err, task)
 		r.resultError = detailedErr
 		slog.ErrorContext(taskCtx, err.Error())
 		return detailedErr
 	}
-	typedmap.Set(r.resultVariable, typedmap.NewTypedKey[any](definition.UntypedID().GetUntypedReference().ReferenceIDString()), result)
-	taskWaiter, _ := r.taskWaiters.Load(definition.UntypedID().GetUntypedReference().String())
+	typedmap.Set(r.resultVariable, typedmap.NewTypedKey[any](task.UntypedID().GetUntypedReference().ReferenceIDString()), result)
+	taskWaiter, _ := r.taskWaiters.Load(task.UntypedID().GetUntypedReference().String())
 	taskWaiter.(*sync.RWMutex).Unlock()
 	return nil
 }
@@ -151,29 +151,29 @@ func newLocalRunnerTaskStatus() *LocalRunnerTaskStat {
 	}
 }
 
-func NewLocalRunner(taskSet *DefinitionSet) (*LocalRunner, error) {
+func NewLocalRunner(taskSet *TaskSet) (*LocalRunner, error) {
 	if !taskSet.runnable {
 		return nil, fmt.Errorf("given taskset must be runnable")
 	}
 	taskStatuses := []*LocalRunnerTaskStat{}
 	taskWaiters := sync.Map{}
-	for i := 0; i < len(taskSet.definitions); i++ {
+	for i := 0; i < len(taskSet.tasks); i++ {
 		taskStatuses = append(taskStatuses, newLocalRunnerTaskStatus())
 
 		// lock the task waiter until its task finished.
 		waiter := sync.RWMutex{}
 		waiter.Lock()
-		taskWaiters.Store(taskSet.definitions[i].UntypedID().ReferenceIDString(), &waiter)
+		taskWaiters.Store(taskSet.tasks[i].UntypedID().ReferenceIDString(), &waiter)
 	}
 	return &LocalRunner{
-		resolvedDefinitionSet: taskSet,
-		started:               false,
-		resultVariable:        nil,
-		resultError:           nil,
-		stopped:               false,
-		taskWaiters:           &taskWaiters,
-		waiter:                make(chan interface{}),
-		taskStatuses:          taskStatuses,
+		resolvedTaskSet: taskSet,
+		started:         false,
+		resultVariable:  nil,
+		resultError:     nil,
+		stopped:         false,
+		taskWaiters:     &taskWaiters,
+		waiter:          make(chan interface{}),
+		taskStatuses:    taskStatuses,
 	}, nil
 }
 
@@ -210,8 +210,8 @@ func (r *LocalRunner) waitDependencies(ctx context.Context, dependencies []taski
 	return nil
 }
 
-func (r *LocalRunner) wrapWithTaskError(err error, definition UntypedDefinition) error {
-	errMsg := fmt.Sprintf("failed to run a task graph.\n definition ID=%s got an error. \n ERROR:\n%v", definition.UntypedID(), err)
+func (r *LocalRunner) wrapWithTaskError(err error, task UntypedTask) error {
+	errMsg := fmt.Sprintf("failed to run a task graph.\n task ID=%s got an error. \n ERROR:\n%v", task.UntypedID(), err)
 	return fmt.Errorf("%s", errMsg)
 }
 
