@@ -32,7 +32,6 @@ import (
 	"github.com/GoogleCloudPlatform/khi/pkg/source/common/k8s_audit/recorder/statusrecorder"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/common/k8s_audit/types"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/inspectiontype"
-	gke_audit_taskid "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/gke_audit/taskid"
 	"github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_audit/fieldextractor"
 	gke_k8saudit_taskid "github.com/GoogleCloudPlatform/khi/pkg/source/gcp/task/gke/k8s_audit/taskid"
 
@@ -41,13 +40,13 @@ import (
 )
 
 // GCPK8sAuditLogSourceTask receives logs generated from the previous tasks specific to OSS audit log parsing and inject dependencies specific to this OSS inspection type.
-var GCPK8sAuditLogSourceTask = inspection_task.NewInspectionTask(gke_audit_taskid.GKEAuditLogSourceTaskID, []taskid.UntypedTaskReference{
-	gke_audit_taskid.GKEAuditLogQueryTaskID,
+var GCPK8sAuditLogSourceTask = inspection_task.NewInspectionTask(gke_k8saudit_taskid.GKEK8sAuditLogSourceTaskID, []taskid.UntypedTaskReference{
+	gke_k8saudit_taskid.K8sAuditQueryTaskID,
 }, func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, progress *progress.TaskProgress) (*types.AuditLogParserLogSource, error) {
 	if taskMode == inspection_task_interface.TaskModeDryRun {
 		return nil, nil
 	}
-	logs := task.GetTaskResult(ctx, gke_audit_taskid.GKEAuditLogQueryTaskID.GetTaskReference())
+	logs := task.GetTaskResult(ctx, gke_k8saudit_taskid.K8sAuditQueryTaskID.GetTaskReference())
 
 	return &types.AuditLogParserLogSource{
 		Logs:      logs,
