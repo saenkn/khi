@@ -43,7 +43,7 @@ var (
 
 	// TaskInstance Finished: dag_id=DAGID, task_id=TASKID, run_id=RUNID, map_index=MAPINDEX, ..., state=STATE ...
 	// ref: https://github.com/apache/airflow/blob/2.7.3/airflow/jobs/scheduler_job_runner.py#L715
-	airflowSchedulerTaskFinishedTemplate = regexp.MustCompile(`TaskInstance Finished:\s+dag_id=(?P<dagid>\S+),\s+task_id=(?P<taskid>\S+),\s+run_id=(?P<runid>\S+),\s+map_index=(?P<mapIndex>\S+),\s+.*state=(?P<state>\S+), executor_state.+`)
+	airflowSchedulerTaskFinishedTemplate = regexp.MustCompile(`TaskInstance Finished:\s+dag_id=(?P<dagid>\S+),\s+task_id=(?P<taskid>\S+),\s+run_id=(?P<runid>\S+),\s+map_index=(?P<mapIndex>\S+),\s+.*?state=(?P<state>\S+)(?:,\s+executor=.+?)?,\s+executor_state.+`)
 
 	// Detected zombie job: {'full_filepath': '...', 'processor_subdir': '...', 'msg': "{'DAG Id': 'DAG_ID', 'Task Id': 'TASK_ID', 'Run Id': 'RUN_ID', 'Hostname': 'WORKER', ...
 	// ref: https://github.com/apache/airflow/blob/2.7.3/airflow/jobs/scheduler_job_runner.py#L1746C55-L1746C62
@@ -399,14 +399,12 @@ func (*AirflowDagProcessorParser) LogTask() taskid.TaskReference[[]*log.LogEntit
 }
 
 func (a *AirflowDagProcessorParser) Parse(ctx context.Context, l *log.LogEntity, cs *history.ChangeSet, builder *history.Builder) error {
-	textPayload, err := l.GetString("textPayload")
-	if err != nil {
-		return fmt.Errorf("textPayload not found. maybe invalid log. please confirm the log %s", l.ID())
-	}
+	textPayload, _ := l.GetString("textPayload")
 
 	dagFileProcessorStats := a.fromLogEntity(textPayload)
 	if dagFileProcessorStats == nil {
-		return fmt.Errorf("this is not a dag file processor stats log, skip")
+		// this is not a dag file processor stats log, skip
+		return nil
 	}
 	cs.RecordRevision(resourcepath.DagFileProcessorStats(dagFileProcessorStats), &history.StagingResourceRevision{
 		Verb:       enum.RevisionVerbComposerTaskInstanceStats,
