@@ -274,7 +274,7 @@ func CreateKHIServer(inspectionServer *inspection.InspectionTaskServer, serverCo
 			ctx.JSON(http.StatusOK, result)
 		})
 
-		router.GET("/api/v2/inspection/tasks/:taskId/data", func(ctx *gin.Context) {
+		inspectionTaskDataHandler := func(ctx *gin.Context) {
 			taskId := ctx.Param("taskId")
 			currentTask := inspectionServer.GetTask(taskId)
 			if currentTask == nil {
@@ -319,9 +319,19 @@ func CreateKHIServer(inspectionServer *inspection.InspectionTaskServer, serverCo
 				ctx.String(http.StatusInternalServerError, err.Error())
 				return
 			}
-			ctx.DataFromReader(http.StatusOK, int64(math.Min(float64(maxSize), float64(fileSize-int(rangeStart)))), "application/octet-stream", inspectionDataReader, map[string]string{})
+			contentType := "application/octet-stream"
+			contentLength := int64(math.Min(float64(maxSize), float64(fileSize-int(rangeStart))))
+			if ctx.Request.Method == http.MethodHead {
+				ctx.Header("Content-Type", contentType)
+				ctx.Header("Content-Length", strconv.Itoa(int(contentLength)))
+				ctx.Status(http.StatusOK)
+			} else {
+				ctx.DataFromReader(http.StatusOK, contentLength, contentType, inspectionDataReader, map[string]string{})
+			}
 			result.ResultStore.Close()
-		})
+		}
+		router.HEAD("/api/v2/inspection/tasks/:taskId/data", inspectionTaskDataHandler)
+		router.GET("/api/v2/inspection/tasks/:taskId/data", inspectionTaskDataHandler)
 
 		router.GET("/api/v2/popup", func(ctx *gin.Context) {
 			currentPopup := popup.Instance.GetCurrentPopup()
