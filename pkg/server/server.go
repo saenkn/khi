@@ -314,6 +314,7 @@ func CreateKHIServer(inspectionServer *inspection.InspectionTaskServer, serverCo
 				ctx.String(http.StatusInternalServerError, err.Error())
 				return
 			}
+			defer result.ResultStore.Close()
 			fileSize, err := result.ResultStore.GetInspectionResultSizeInBytes()
 			if err != nil {
 				ctx.String(http.StatusInternalServerError, err.Error())
@@ -328,7 +329,6 @@ func CreateKHIServer(inspectionServer *inspection.InspectionTaskServer, serverCo
 			} else {
 				ctx.DataFromReader(http.StatusOK, contentLength, contentType, inspectionDataReader, map[string]string{})
 			}
-			result.ResultStore.Close()
 		}
 		router.HEAD("/api/v2/inspection/tasks/:taskId/data", inspectionTaskDataHandler)
 		router.GET("/api/v2/inspection/tasks/:taskId/data", inspectionTaskDataHandler)
