@@ -205,6 +205,7 @@ func (i *InspectionTaskRunner) Run(ctx context.Context, req *inspection_task.Ins
 		InspectTimeUnixSeconds: time.Now().Unix(),
 		InspectionType:         currentInspectionType.Name,
 		InspectionTypeIconPath: currentInspectionType.Icon,
+		SuggestedFileName:      "unnamed.khi",
 	}, runnableTaskGraph)
 
 	runCtx = khictx.WithValue(runCtx, inspection_task_contextkey.InspectionRunMetadata, runMetadata)
