@@ -63,7 +63,7 @@ func (d *testTask) Dependencies() []taskid.UntypedTaskReference {
 
 // assertSortTaskGraph is a test helper that verifies the sortTaskGraph results
 // match the expected task IDs, missing dependencies, etc.
-func assertSortTaskGraph(t *testing.T, tasks []UntypedTask, expectedTaskIDs []string, expectedMissing []string, expectedRunnable bool, expectedHasCyclicDependency bool) {
+func assertSortTaskGraph(t *testing.T, tasks []UntypedTask, expectedTaskIDs []string, expectedMissing []string, expectedRunnable bool, expectedCyclicDependencyPath string) {
 	t.Helper() // Mark this as a helper function to improve test output
 
 	// Create task set and run the sort
@@ -76,8 +76,8 @@ func assertSortTaskGraph(t *testing.T, tasks []UntypedTask, expectedTaskIDs []st
 	}
 
 	// Compare actual vs expected cyclic dependency status
-	if result.HasCyclicDependency != expectedHasCyclicDependency {
-		t.Errorf("Expected hasCyclicDependency=%v, got %v", expectedHasCyclicDependency, result.HasCyclicDependency)
+	if result.CyclicDependencyPath != expectedCyclicDependencyPath {
+		t.Errorf("Expected cyclicDependencyPath=%v, got %v", expectedCyclicDependencyPath, result.CyclicDependencyPath)
 	}
 
 	// If not runnable and expected not runnable with specific reasons, check missing dependencies
@@ -140,7 +140,7 @@ func TestSortTaskGraphWithValidGraph(t *testing.T) {
 	expectedTaskIDs := []string{"bar", "foo", "quux", "qux"}
 
 	// This graph is valid, so no missing dependencies, is runnable, and has no cycles
-	assertSortTaskGraph(t, tasks, expectedTaskIDs, []string{}, true, false)
+	assertSortTaskGraph(t, tasks, expectedTaskIDs, []string{}, true, "")
 }
 
 func TestSortTaskGraphReturnsTheStableResult(t *testing.T) {
@@ -154,10 +154,10 @@ func TestSortTaskGraphReturnsTheStableResult(t *testing.T) {
 		}
 
 		// Expected order after topological sort
-		expectedTaskIDs := []string{"foo", "bar", "quux", "qux"}
+		expectedTaskIDs := []string{"foo", "qux", "quux", "bar"}
 
 		// This graph is valid, so no missing dependencies, is runnable, and has no cycles
-		assertSortTaskGraph(t, tasks, expectedTaskIDs, []string{}, true, false)
+		assertSortTaskGraph(t, tasks, expectedTaskIDs, []string{}, true, "")
 	}
 }
 
@@ -173,7 +173,7 @@ func TestSortTaskGraphWithMissingDependency(t *testing.T) {
 	expectedMissing := []string{"missing-input1", "missing-input2"}
 
 	// When dependencies are missing, we don't have a sorted list of tasks
-	assertSortTaskGraph(t, tasks, []string{}, expectedMissing, false, false)
+	assertSortTaskGraph(t, tasks, []string{}, expectedMissing, false, "")
 }
 
 func TestResolveGraphWithCircularDependency(t *testing.T) {
@@ -183,10 +183,11 @@ func TestResolveGraphWithCircularDependency(t *testing.T) {
 		newDebugTask("qux", []string{"quux"}),
 		newDebugTask("quux", []string{"foo", "bar"}),
 	}
-
-	// This graph has a cycle, so we expect it to be not runnable
-	// When there's a cycle, we don't have a sorted list of tasks or missing dependencies
-	assertSortTaskGraph(t, tasks, []string{}, []string{}, false, true)
+	for i := 0; i < 100; i++ { // to check the stability
+		// This graph has a cycle, so we expect it to be not runnable
+		// When there's a cycle, we don't have a sorted list of tasks or missing dependencies
+		assertSortTaskGraph(t, tasks, []string{}, []string{}, false, "... -> foo#default] -> [quux#default -> qux#default -> foo#default] -> [quux#default -> ...")
+	}
 }
 
 // assertResolveTask is a test helper that verifies the ResolveTask results
@@ -244,16 +245,16 @@ test_init_default -> test_done_default
 			ResolvedShape: `digraph G {
 start [shape="diamond",fillcolor=gray,style=filled]
 test_init_default [shape="circle",label="test-init#default"]
-bar_default [shape="circle",label="bar#default"]
-foo_default [shape="circle",label="foo#default"]
-quux_default [shape="circle",label="quux#default"]
 quz_default [shape="circle",label="quz#default"]
+quux_default [shape="circle",label="quux#default"]
+foo_default [shape="circle",label="foo#default"]
+bar_default [shape="circle",label="bar#default"]
 test_done_default [shape="circle",label="test-done#default"]
 start -> test_init_default
-test_init_default -> bar_default
-test_init_default -> foo_default
-test_init_default -> quux_default
 test_init_default -> quz_default
+test_init_default -> quux_default
+test_init_default -> foo_default
+test_init_default -> bar_default
 bar_default -> test_done_default
 foo_default -> test_done_default
 quux_default -> test_done_default
@@ -272,15 +273,15 @@ test_init_default -> test_done_default
 			ResolvedShape: `digraph G {
 start [shape="diamond",fillcolor=gray,style=filled]
 test_init_default [shape="circle",label="test-init#default"]
-foo_default [shape="circle",label="foo#default"]
-quux_default [shape="circle",label="quux#default"]
 quz_default [shape="circle",label="quz#default"]
+quux_default [shape="circle",label="quux#default"]
+foo_default [shape="circle",label="foo#default"]
 bar_default [shape="circle",label="bar#default"]
 test_done_default [shape="circle",label="test-done#default"]
 start -> test_init_default
-test_init_default -> foo_default
-test_init_default -> quux_default
 test_init_default -> quz_default
+test_init_default -> quux_default
+test_init_default -> foo_default
 foo_default -> bar_default
 quz_default -> bar_default
 bar_default -> test_done_default
@@ -387,12 +388,12 @@ func TestDumpGraphviz(t *testing.T) {
 
 	expected := `digraph G {
 start [shape="diamond",fillcolor=gray,style=filled]
-quux_default [shape="circle",label="quux#default"]
 qux_default [shape="circle",label="qux#default"]
+quux_default [shape="circle",label="quux#default"]
 bar_default [shape="circle",label="bar#default"]
 foo_default [shape="circle",label="foo#default"]
-start -> quux_default
 start -> qux_default
+start -> quux_default
 qux_default -> bar_default
 quux_default -> bar_default
 bar_default -> foo_default
@@ -429,14 +430,14 @@ func TestDumpGraphvizReturnsStableResult(t *testing.T) {
 
 		expected := `digraph G {
 start [shape="diamond",fillcolor=gray,style=filled]
+qux_default [shape="circle",label="qux#default"]
+quux_default [shape="circle",label="quux#default"]
 fuga_default [shape="circle",label="fuga#default"]
 hoge_default [shape="circle",label="hoge#default"]
-quux_default [shape="circle",label="quux#default"]
-qux_default [shape="circle",label="qux#default"]
 foo_default [shape="circle",label="foo#default"]
-start -> fuga_default
-start -> quux_default
 start -> qux_default
+start -> quux_default
+start -> fuga_default
 fuga_default -> hoge_default
 qux_default -> foo_default
 quux_default -> foo_default
