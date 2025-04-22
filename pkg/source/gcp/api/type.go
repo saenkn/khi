@@ -1,4 +1,4 @@
-// Copyright 2024 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package composer_task
+package api
 
-import (
-	_ "github.com/GoogleCloudPlatform/khi/internal/testflags"
-)
+// ref: https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters#Cluster
+type Cluster struct {
+	Name           string            `json:"name"`
+	ResourceLabels map[string]string `json:"resourceLabels"`
+}
