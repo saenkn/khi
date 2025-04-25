@@ -368,14 +368,6 @@ func TestApiResponses(t *testing.T) {
 		},
 		{
 			// 011
-			// Attempting to access non started task result
-			ExpectedCode:  400,
-			RequestMethod: "HEAD",
-			RequestPath:   "/foo/api/v3/inspection/<task-1>/data",
-			BodyValidator: bodyCompareWithStringExpectedValue("this task is not yet started"),
-		},
-		{
-			// 012
 			// Attempting to access non started task metadata
 			ExpectedCode:  400,
 			RequestMethod: "GET",
@@ -383,7 +375,7 @@ func TestApiResponses(t *testing.T) {
 			BodyValidator: bodyCompareWithStringExpectedValue("this task is not yet started"),
 		},
 		{
-			// 013
+			// 012
 			// Attempting to cancel non started task result
 			ExpectedCode:  400,
 			RequestMethod: "POST",
@@ -391,7 +383,7 @@ func TestApiResponses(t *testing.T) {
 			BodyValidator: bodyCompareWithStringExpectedValue("this task is not yet started"),
 		},
 		{
-			// 014
+			// 013
 			ExpectedCode:  202,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/inspection/<task-1>/run",
@@ -404,20 +396,20 @@ func TestApiResponses(t *testing.T) {
 			WaitAfter:     time.Second,
 		},
 		{
-			// 015
+			// 014
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection",
 			BodyValidator: taskCompare("task-1", `{"error":{"errorMessages":[]},"progress":{"phase":"DONE","progresses":[],"totalProgress":{"id":"Total","indeterminate":false,"label":"Total","message":"2 of 2 tasks complete","percentage":1}}}`, "header"),
 		},
 		{
-			// 016
+			// 015
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection/<task-1>/metadata",
 		},
 		{
-			// 017
+			// 016
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection/<task-1>/data",
@@ -428,19 +420,7 @@ func TestApiResponses(t *testing.T) {
 			},
 		},
 		{
-			// 018
-			ExpectedCode:  200,
-			RequestMethod: "HEAD",
-			RequestPath:   "/foo/api/v3/inspection/<task-1>/data",
-			BodyValidator: func(t *testing.T, body string, stat map[string]string) {
-				if len(body) > 0 {
-					// RFC 9110 (https://www.ietf.org/rfc/rfc9110.txt) - 9.3.2. HEAD
-					t.Errorf("HEAD shouldn't have any body data\n%s", body)
-				}
-			},
-		},
-		{
-			// 019
+			// 017
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection/<task-1>/data?start=1",
@@ -451,7 +431,7 @@ func TestApiResponses(t *testing.T) {
 			},
 		},
 		{
-			// 020
+			// 018
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection/<task-1>/data?start=1&maxSize=1",
@@ -462,13 +442,13 @@ func TestApiResponses(t *testing.T) {
 			},
 		},
 		{
-			// 021
+			// 019
 			ExpectedCode:  400,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/inspection/<task-1>/cancel",
 		},
 		{
-			// 022
+			// 020
 			ExpectedCode:  202,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/inspection/types/bar",
@@ -482,7 +462,7 @@ func TestApiResponses(t *testing.T) {
 			},
 		},
 		{
-			// 023
+			// 021
 			ExpectedCode:  202,
 			RequestMethod: "PUT",
 			RequestPath:   "/foo/api/v3/inspection/<task-2>/features",
@@ -496,7 +476,7 @@ func TestApiResponses(t *testing.T) {
 			BodyValidator: bodyCompareWithStringExpectedValue(`ok`),
 		},
 		{
-			// 024
+			// 022
 			ExpectedCode:  202,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/inspection/<task-2>/run",
@@ -507,48 +487,41 @@ func TestApiResponses(t *testing.T) {
 			WaitAfter:     time.Second,
 		},
 		{
-			// 025
+			// 023
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection",
 			BodyValidator: taskCompare("task-2", `{"error":{"errorMessages":[]},"progress":{"phase":"RUNNING","progresses":[{"id":"neverend#default","indeterminate":false,"label":"neverend#default","message":"test","percentage":0.5}],"totalProgress":{"id":"Total","indeterminate":false,"label":"Total","message":"0 of 3 tasks complete","percentage":0}}}`, "header"),
 		},
 		{
-			// 026
+			// 024
 			ExpectedCode:  400,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection/<task-2>/data",
 			BodyValidator: bodyCompareWithStringExpectedValue("this task runner hasn't finished yet"),
 		},
 		{
-			// 027
-			ExpectedCode:  400,
-			RequestMethod: "HEAD",
-			RequestPath:   "/foo/api/v3/inspection/<task-2>/data",
-			BodyValidator: bodyCompareWithStringExpectedValue("this task runner hasn't finished yet"),
-		},
-		{
-			// 028
+			// 025
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection/<task-2>/metadata",
 		},
 		{
-			// 029
+			// 026
 			ExpectedCode:  200,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/inspection/<task-2>/cancel",
 			WaitAfter:     time.Second,
 		},
 		{
-			// 030
+			// 027
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection",
 			BodyValidator: taskCompare("task-2", `{"error":{"errorMessages":[]},"progress":{"phase":"CANCELLED","progresses":[],"totalProgress":{"id":"Total","indeterminate":false,"label":"Total","message":"1 of 3 tasks complete","percentage":0.33333334}}}`, "header"),
 		},
 		{
-			// 031
+			// 028
 			ExpectedCode:  202,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/inspection/types/qux",
@@ -562,7 +535,7 @@ func TestApiResponses(t *testing.T) {
 			},
 		},
 		{
-			// 032
+			// 029
 			ExpectedCode:  202,
 			RequestMethod: "PUT",
 			RequestPath:   "/foo/api/v3/inspection/<task-3>/features",
@@ -576,7 +549,7 @@ func TestApiResponses(t *testing.T) {
 			BodyValidator: bodyCompareWithStringExpectedValue(`ok`),
 		},
 		{
-			// 033
+			// 030
 			ExpectedCode:  202,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/inspection/<task-3>/run",
@@ -587,14 +560,14 @@ func TestApiResponses(t *testing.T) {
 			WaitAfter:     time.Second,
 		},
 		{
-			// 034
+			// 031
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/inspection",
 			BodyValidator: taskCompare("task-3", `{"error":{"errorMessages":[]},"progress":{"phase":"ERROR","progresses":[],"totalProgress":{"id":"Total","indeterminate":false,"label":"Total","message":"1 of 3 tasks complete","percentage":0.33333334}}}`, "header"),
 		},
 		{
-			// 035
+			// 032
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/popup",
@@ -609,7 +582,7 @@ func TestApiResponses(t *testing.T) {
 			},
 		},
 		{
-			// 036
+			// 033
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/popup",
@@ -623,7 +596,7 @@ func TestApiResponses(t *testing.T) {
 			),
 		},
 		{
-			// 037
+			// 034
 			ExpectedCode:  200,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/popup/validate",
@@ -640,7 +613,7 @@ func TestApiResponses(t *testing.T) {
 			),
 		},
 		{
-			// 038
+			// 035
 			ExpectedCode:  200,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/popup/validate",
@@ -657,7 +630,7 @@ func TestApiResponses(t *testing.T) {
 			),
 		},
 		{
-			// 039
+			// 036
 			ExpectedCode:  400,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/popup/validate",
@@ -670,7 +643,7 @@ func TestApiResponses(t *testing.T) {
 			BodyValidator: bodyCompareWithStringExpectedValue("given id is not matching with the current popup"),
 		},
 		{
-			// 040
+			// 037
 			ExpectedCode:  400,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/popup/answer",
@@ -683,7 +656,7 @@ func TestApiResponses(t *testing.T) {
 			BodyValidator: bodyCompareWithStringExpectedValue("given id is not matching with the current popup"),
 		},
 		{
-			// 041
+			// 038
 			ExpectedCode:  200,
 			RequestMethod: "POST",
 			RequestPath:   "/foo/api/v3/popup/answer",
@@ -699,14 +672,14 @@ func TestApiResponses(t *testing.T) {
 			},
 		},
 		{
-			// 042
+			// 039
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/popup",
 			BodyValidator: bodyCompareWithStringExpectedValue(""),
 		},
 		{
-			// 043
+			// 040
 			ExpectedCode:  200,
 			RequestMethod: "GET",
 			RequestPath:   "/foo/api/v3/config",
