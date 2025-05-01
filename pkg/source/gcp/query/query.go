@@ -60,14 +60,14 @@ type ProjectIDDefaultResourceNamesGenerator struct{}
 
 // GenerateResourceNames implements DefaultResourceNamesGenerator.
 func (p *ProjectIDDefaultResourceNamesGenerator) GenerateResourceNames(ctx context.Context) ([]string, error) {
-	projectID := task.GetTaskResult(ctx, gcp_task.InputProjectIdTaskID.GetTaskReference())
+	projectID := task.GetTaskResult(ctx, gcp_task.InputProjectIdTaskID.Ref())
 	return []string{fmt.Sprintf("projects/%s", projectID)}, nil
 }
 
 // GetDependentTasks implements DefaultResourceNamesGenerator.
 func (p *ProjectIDDefaultResourceNamesGenerator) GetDependentTasks() []taskid.UntypedTaskReference {
 	return []taskid.UntypedTaskReference{
-		gcp_task.InputProjectIdTaskID.GetTaskReference(),
+		gcp_task.InputProjectIdTaskID.Ref(),
 	}
 }
 
@@ -78,10 +78,10 @@ var queryThreadPool = worker.NewPool(16)
 func NewQueryGeneratorTask(taskId taskid.TaskImplementationID[[]*log.LogEntity], readableQueryName string, logType enum.LogType, dependencies []taskid.UntypedTaskReference, resourceNamesGenerator DefaultResourceNamesGenerator, generator QueryGeneratorFunc, sampleQuery string) task.Task[[]*log.LogEntity] {
 	return inspection_task.NewProgressReportableInspectionTask(taskId, append(
 		append(dependencies, resourceNamesGenerator.GetDependentTasks()...),
-		gcp_task.InputStartTimeTaskID,
-		gcp_task.InputEndTimeTaskID,
-		inspection_task.ReaderFactoryGeneratorTaskID,
-		gcp_taskid.LoggingFilterResourceNameInputTaskID.GetTaskReference(),
+		gcp_task.InputStartTimeTaskID.Ref(),
+		gcp_task.InputEndTimeTaskID.Ref(),
+		inspection_task.ReaderFactoryGeneratorTaskID.Ref(),
+		gcp_taskid.LoggingFilterResourceNameInputTaskID.Ref(),
 	), func(ctx context.Context, taskMode inspection_task_interface.InspectionTaskMode, progress *progress.TaskProgress) ([]*log.LogEntity, error) {
 		client, err := api.DefaultGCPClientFactory.NewClient()
 		if err != nil {
@@ -89,7 +89,7 @@ func NewQueryGeneratorTask(taskId taskid.TaskImplementationID[[]*log.LogEntity],
 		}
 
 		metadata := khictx.MustGetValue(ctx, inspection_task_contextkey.InspectionRunMetadata)
-		resourceNames := task.GetTaskResult(ctx, gcp_taskid.LoggingFilterResourceNameInputTaskID.GetTaskReference())
+		resourceNames := task.GetTaskResult(ctx, gcp_taskid.LoggingFilterResourceNameInputTaskID.Ref())
 		taskInput := khictx.MustGetValue(ctx, inspection_task_contextkey.InspectionTaskInput)
 
 		defaultResourceNames, err := resourceNamesGenerator.GenerateResourceNames(ctx)
@@ -102,7 +102,7 @@ func NewQueryGeneratorTask(taskId taskid.TaskImplementationID[[]*log.LogEntity],
 		resourceNamesFromInput := defaultResourceNames
 		inputStr, found := taskInput[queryResourceNamePair.GetInputID()]
 		if found {
-			resourceNamesFromInput := strings.Split(inputStr.(string), " ")
+			resourceNamesFromInput = strings.Split(inputStr.(string), " ")
 			resourceNamesList := []string{}
 			hadError := false
 			for _, resourceNameFromInput := range resourceNamesFromInput {
@@ -119,9 +119,9 @@ func NewQueryGeneratorTask(taskId taskid.TaskImplementationID[[]*log.LogEntity],
 			}
 		}
 
-		readerFactory := task.GetTaskResult(ctx, inspection_task.ReaderFactoryGeneratorTaskID.GetTaskReference())
-		startTime := task.GetTaskResult(ctx, gcp_task.InputStartTimeTaskID.GetTaskReference())
-		endTime := task.GetTaskResult(ctx, gcp_task.InputEndTimeTaskID.GetTaskReference())
+		readerFactory := task.GetTaskResult(ctx, inspection_task.ReaderFactoryGeneratorTaskID.Ref())
+		startTime := task.GetTaskResult(ctx, gcp_task.InputStartTimeTaskID.Ref())
+		endTime := task.GetTaskResult(ctx, gcp_task.InputEndTimeTaskID.Ref())
 
 		queryStrings, err := generator(ctx, taskMode)
 		if err != nil {
