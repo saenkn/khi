@@ -92,6 +92,10 @@ export class GroupParameterComponent {
    */
   parameter = input.required<GroupParameterFormField>();
 
+  /**
+   * If the children is collapsed or not. When it is null, user didn't click the expander to toggle yet.
+   * When this is true, then the children is collapsed and hidden.
+   */
   private readonly collapsedFromUserInput = signal<boolean | null>(null);
 
   childrenStatus = computed(() => {
@@ -104,6 +108,6 @@ export class GroupParameterComponent {
    * Toggle the collapsed status for children.
    */
   toggle() {
-    this.collapsedFromUserInput.set(this.childrenStatus() === 'collapsed');
+    this.collapsedFromUserInput.set(this.childrenStatus() !== 'collapsed');
   }
 }
