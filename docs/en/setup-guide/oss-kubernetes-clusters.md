@@ -1,8 +1,10 @@
+Language: English | [日本語](/docs/ja/setup-guide/oss-kubernetes-clusters.md)
+
 # Using KHI with OSS Kubernetes Clusters - Example with Loki
 
 Kubernetes History Inspector (KHI) can visualize a wealth of information using only `kube-apiserver` audit logs. This tutorial demonstrates how to visualize the state of Kubernetes resources with KHI by leveraging audit logs aggregated using [Loki](https://grafana.com/oss/loki/) within an easy-to-prepare Kubernetes environment set up via [kind](https://kind.sigs.k8s.io/).
 
-**Prerequisites:**
+## Prerequisites
 
 Before you start, ensure you have the following tools installed:
 
@@ -15,7 +17,7 @@ Before you start, ensure you have the following tools installed:
 
 First, we'll start from creating a `kind` Kubernetes cluster with the audit logs enabled.
 
-**a. Create an Audit Policy:**
+### a. Create an Audit Policy
 
 `kube-apisever` records actions taken by users, administrators, and system components as its audit logs. The audit policy allow us to configure the `kube-apiserver` what to log. Create a file named `audit-policy.yaml` in a new directory called `audit-policy` with the following content:
 
@@ -40,7 +42,7 @@ rules:
 * `level: Metadata`: Logs request metadata (requesting user, timestamp, resource, verb, etc.) but not the request or response body.
 * `level: RequestResponse`: Logs the request and response bodies as well as the request metadata. This level provides the most detailed information.
 
-**b. Create a Kind Configuration:**
+### b. Create a Kind Configuration
 
 Next, create a `kind` configuration file (e.g., `kind-config.yaml`) to define the cluster structure and enable audit logging by mounting the policy file and specifying audit log paths.
 
@@ -85,7 +87,7 @@ nodes:
 - role: worker
 ```
 
-**c. Create the Kind Cluster:**
+### c. Create the Kind Cluster
 
 Now, create the cluster using the configuration file:
 
@@ -99,7 +101,7 @@ This command will bootstrap a Kubernetes cluster with one control-plane node and
 
 This step is optional. If you already have a running Loki instance (self-hosted or Grafana Cloud), you can configure Fluent Bit to send logs there. Otherwise, deploy a simple Loki instance within the `kind` cluster for this tutorial.
 
-**a. Create Loki Values File:**
+### a. Create Loki Values File
 
 Create a file named `loki-values.yaml` for the Loki Helm chart:
 
@@ -130,7 +132,7 @@ write:
   replicas: 0
 ```
 
-**b. Install Loki using Helm:**
+### b. Install Loki using Helm
 
 Add the Grafana Helm repository and install Loki:
 
@@ -150,7 +152,7 @@ kubectl get pods -n khi -l app.kubernetes.io/instance=loki
 
 We'll use Fluent Bit, a lightweight log processor and forwarder, deployed as a DaemonSet to collect logs from all nodes (including the control-plane) and send them to Loki.
 
-**a. Create Fluent Bit Values File:**
+### a. Create Fluent Bit Values File
 
 Create a file named `fluentbit-values.yaml`:
 
@@ -216,7 +218,7 @@ extraVolumeMounts:
     readOnly: true
 ```
 
-**b. Install Fluent Bit using Helm:**
+### b. Install Fluent Bit using Helm
 
 Add the Fluent Helm repository and install Fluent Bit:
 
@@ -256,7 +258,7 @@ The api server produces audit logs by the operations then Fluent bit collects th
 
 Now, retrieve the collected audit logs from Loki using `logcli`.
 
-**a. Port-forward the Loki Service:**
+### a. Port-forward the Loki Service
 
 Make the Loki service accessible on your local machine:
 
@@ -266,7 +268,7 @@ kubectl port-forward --namespace khi service/loki-gateway 8000:80
 
 Keep this command running in a separate terminal.
 
-**b. Query Loki:**
+### b. Query Loki
 
 Use `logcli` to query Loki for the audit logs and save them to a file named `audit_log_export.jsonl`. Adjust the `--from` and `--to` timestamps to encompass the time you ran the `kubectl` commands.
 
@@ -299,7 +301,7 @@ logcli query '{job="audit"}' \
 
 Finally, let's use KHI to inspect the exported audit logs.
 
-**a. Run KHI:**
+### a. Run KHI
 
 Start the KHI server using Docker:
 
@@ -321,31 +323,31 @@ For Cloud Shell users:
 
 ```
 
-**b. Access KHI UI:**
+### b. Access KHI UI
 
 Open your web browser and navigate to `http://localhost:8080`.
 
-**c. Create New Inspection:**
+### c. Create New Inspection
 
 1. Click on "New Inspection".
 2. Select "OSS Kubernetes Cluster" as the inspection type.
 
-![new-inspection](./images/oss/new-inspection.png)
+![new-inspection](/docs/en/images/oss/new-inspection.png)
 
-**d. Upload Log File and Run:**
+### d. Upload Log File and Run
 
 1. In the "Input Parameters" section, under "File Upload", click "Browse" or drag-and-drop the `audit_log_export.jsonl` file you created.
 2. Click "Upload" button, and wait for the file to be uploaded.
 3. Click the "Run" button.
 4. Wait for the inspection process to complete.
 
-![input-param](./images/oss/input-param.png)
+![input-param](/docs/en/images/oss/input-param.png)
 
-**e. Explore the Results:**
+### e. Explore the Results
 
 Once the inspection is finished, click the "Open" button to view the results. Explore the different views, especially the "Timeline" view. You should be able to see the events related to the Nginx deployment creation, scaling, and deletion, illustrating how the cluster state changed over time.
 
-![timeline](./images/oss/timeline.png)
+![timeline](/docs/en/images/oss/timeline.png)
 
 ## 7. Cleanup
 
