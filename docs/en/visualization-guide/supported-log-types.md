@@ -1,3 +1,5 @@
+Language: English | [日本語](TBA)
+
 # Supported Log Types
 
 This greatly helps us to understand the detail of a resource but it's quite hard to understand it. This is an example k8s audit log recorded in a GKE cluster.

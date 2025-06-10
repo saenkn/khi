@@ -1,3 +1,5 @@
+Language: English | [日本語](TBA)
+
 # Timelie View
 
 This document is a part of [User Guide](/docs/en/visualization-guide/user-guide.md).
@@ -190,11 +192,9 @@ Clicking on any element on the timeline view. The log view and history view on t
 
 ![Timeline view timeline selection](/docs/en/images/guide-timeline-selection.png)
 
-Read [LogView](TBA) and [History View](TBA) for more details.
+Read [Log View](/docs/en/visualization-guide/log-view.md) and [History View](TBA) for more details.
 
 ## Keyboard Shortcuts
-
-To scale the timeline view in or out, hold the Shift key and scroll your mouse. KHI will scale the view around the time point at your mouse pointer location.
 
 | Keyboard Shortcut | Action |
 |---|---|

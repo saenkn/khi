@@ -1,3 +1,5 @@
+Language: English | [日本語](TBA)
+
 # User guide
 
 > [!NOTE]
