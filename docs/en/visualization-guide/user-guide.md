@@ -30,36 +30,6 @@ The right side is dedicated to details of each resource. You can see detailed in
 
 ![User guide timeline screens](/docs/en/images/guide-timeline-screen.png)
 
-### Timeline view
-
-Timelines in the diagram are displayed in hierarchical order (Kind > Namespace > Resource name > Subresource).
-To scale the timeline diagram in or out, hold the Shift key and scroll your mouse. KHI will scale the view around the time point at your mouse pointer location.
-
-![User guide timeline diagram](/docs/en/images/guide-timeline-diagram.png)
-
-The colorful belts on the timelines are called `revisions`. Each revision represents a state that continues from its left edge (start time) to its right edge (end time).
-You can see the meaning of each color by hovering your mouse pointer over the revision.
-
-KHI also shows several supplemental timelines as pseudo-subresource timelines. These pseudo-subresources are not actual subresources in Kubernetes, but KHI associates these complementary timelines with resources for better visualization. The color meanings of these pseudo-subresources may vary depending on their relationship with their parent resource.
-This relationship is indicated by a colorful chip next to the subresource name on the left side.
-
-![User guide timeline revisions](/docs/en/images/guide-timelines-revisions.png)
-
-Diamond shapes on the timelines are called `events` in KHI (note that these are not Kubernetes events). These indicate that a log was associated with the resource at that specific time.
-The colors of the events indicate their severity and log type. Hover your mouse pointer over an event to see its details.
-
-![User guide timeline events](/docs/en/images/guide-timelines-events.png)
-
-Clicking on a timeline's name or any element within it will select that timeline. The log view and history view on the right side of the timeline diagram will then display data corresponding to the selected timeline.
-
-![User guide timeline selection](/docs/en/images/guide-timeline-selection.png)
-
-### Log view
-
-The log view automatically shows only the logs related to the selected timeline.
-
-![User guide log-view](/docs/en/images/guide-log-view.png)
-
 ### History view
 
 The history view shows the modification history of the selected timeline.
